@@ -1,0 +1,46 @@
+@model OrderDetailsDto
+
+@{
+    ViewData["Title"] = "Order placed";
+}
+
+<div class="container">
+    <section class="order-confirm">
+        <div class="order-confirm-mark" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+            </svg>
+        </div>
+
+        <span class="eyebrow">Thank you</span>
+        <h1>Your order is confirmed.</h1>
+        <p class="order-confirm-lede">
+            We have your books reserved. We will call <strong>@Model.ShippingPhone</strong>
+            to confirm delivery.
+        </p>
+
+        <dl class="order-confirm-card">
+            <div>
+                <dt>Order number</dt>
+                <dd>@Model.OrderNumber</dd>
+            </div>
+            <div>
+                <dt>Total</dt>
+                <dd>EGP @Model.Total.ToString("N2")</dd>
+            </div>
+            <div>
+                <dt>Payment</dt>
+                <dd>@Model.PaymentLabel</dd>
+            </div>
+        </dl>
+
+        <div class="order-confirm-actions">
+            <a class="btn btn-primary" asp-controller="Orders" asp-action="Details" asp-route-id="@Model.Id">
+                Track your order
+                <span aria-hidden="true">→</span>
+            </a>
+            <a class="btn btn-secondary" asp-controller="Books" asp-action="Index">Keep browsing</a>
+        </div>
+    </section>
+</div>

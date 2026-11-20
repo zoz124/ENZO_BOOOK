@@ -1,0 +1,149 @@
+@model CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container">
+    <div style="padding-block: var(--space-12) 0">
+        <span class="eyebrow">Almost yours</span>
+        <h1 style="font-size: clamp(1.9rem, 3.4vw, 2.6rem)">Checkout</h1>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div asp-validation-summary="All" class="alert alert-error" role="alert"></div>
+    }
+
+    <form method="post" asp-controller="Checkout" asp-action="Place">
+        <input type="hidden" asp-for="Form.IdempotencyKey" />
+
+        <div class="cart-layout">
+            <div>
+                @if (Model.Addresses.Count > 0)
+                {
+                    <section class="card" style="margin-block-end: var(--space-4)">
+                        <h2 style="font-size: var(--font-size-h3)">1. Shipping address</h2>
+
+                        @foreach (var address in Model.Addresses)
+                        {
+                            <label style="display: block; margin-block-end: var(--space-2)">
+                                <input type="radio" name="AddressId" value="@address.Id"
+                                       checked="@(Model.Form.AddressId == address.Id)" />
+                                <strong>@address.FullName</strong> — @address.City, @address.AddressLine
+                                @if (address.IsDefault)
+                                {
+                                    <span class="badge badge-info">Default</span>
+                                }
+                            </label>
+                        }
+
+                        <label style="display: block">
+                            <input type="radio" name="AddressId" value="0" checked="@(Model.Form.AddressId is null or 0)" />
+                            Use a new address
+                        </label>
+                    </section>
+                }
+
+                <section class="card" style="margin-block-end: var(--space-4)">
+                    <h2 style="font-size: var(--font-size-h3)">@(Model.Addresses.Count > 0 ? "Or enter a new address" : "1. Shipping address")</h2>
+
+                    <div class="form-grid">
+                        <div class="field">
+                            <label asp-for="Form.FullName">Full name</label>
+                            <input class="input" asp-for="Form.FullName" />
+                            <span asp-validation-for="Form.FullName" class="field-error"></span>
+                        </div>
+
+                        <div class="field">
+                            <label asp-for="Form.Phone">Phone</label>
+                            <input class="input" asp-for="Form.Phone" placeholder="01xxxxxxxxx" />
+                            <span asp-validation-for="Form.Phone" class="field-error"></span>
+                        </div>
+
+                        <div class="field">
+                            <label asp-for="Form.City">City / governorate</label>
+                            <input class="input" asp-for="Form.City" />
+                            <span asp-validation-for="Form.City" class="field-error"></span>
+                        </div>
+
+                        <div class="field">
+                            <label asp-for="Form.PostalCode">Postal code (optional)</label>
+                            <input class="input" asp-for="Form.PostalCode" />
+                        </div>
+
+                        <div class="field full">
+                            <label asp-for="Form.AddressLine">Street address</label>
+                            <input class="input" asp-for="Form.AddressLine" />
+                            <span asp-validation-for="Form.AddressLine" class="field-error"></span>
+                        </div>
+
+                        <div class="field full">
+                            <label>
+                                <input asp-for="Form.SaveAddress" />
+                                Save this address to my account
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2 style="font-size: var(--font-size-h3)">2. Payment</h2>
+
+                    <fieldset class="pay-options pay-options--inline">
+                        <legend class="visually-hidden">Payment method</legend>
+
+                        <label class="pay-option">
+                            <input type="radio" asp-for="Form.PaymentMethod" value="Cash" />
+                            <span class="pay-option-body">
+                                <strong>Cash on delivery</strong>
+                                <small>Pay the courier when your books arrive</small>
+                            </span>
+                        </label>
+
+                        <label class="pay-option">
+                            <input type="radio" asp-for="Form.PaymentMethod" value="Visa" />
+                            <span class="pay-option-body">
+                                <strong>Visa / card</strong>
+                                <small>Demo checkout — no card is charged</small>
+                            </span>
+                        </label>
+                    </fieldset>
+
+                    <span asp-validation-for="Form.PaymentMethod" class="field-error"></span>
+                </section>
+            </div>
+
+            <aside class="summary-card">
+                <h2>3. Review</h2>
+
+                @foreach (var line in Model.Cart.Lines)
+                {
+                    <div class="summary-row">
+                        <span>@line.Title × @line.Quantity</span>
+                        <span>@line.LineTotal.ToString("N2")</span>
+                    </div>
+                }
+
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>@(Model.Cart.Shipping == 0 ? "Free" : $"EGP {Model.Cart.Shipping:N2}")</span>
+                </div>
+
+                <div class="summary-row summary-total">
+                    <span>Total</span>
+                    <span>EGP @Model.Cart.Total.ToString("N2")</span>
+                </div>
+
+                <button class="btn btn-primary btn-lg" style="inline-size: 100%; margin-block-start: var(--space-6)"
+                        type="submit" data-submitting-text="Placing your order…">
+                    Place order
+                </button>
+            </aside>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/app.js" asp-append-version="true"></script>
+}

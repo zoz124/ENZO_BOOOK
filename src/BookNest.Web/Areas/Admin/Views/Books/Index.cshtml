@@ -1,0 +1,129 @@
+@model PagedResult<BookCardDto>
+
+@{
+    ViewData["Title"] = "Books";
+    var search = ViewData["Search"] as string;
+    var lowStock = ViewData["LowStock"] as bool? ?? false;
+
+    var routeValues = new Dictionary<string, string>();
+    if (!string.IsNullOrWhiteSpace(search)) routeValues["q"] = search;
+    if (lowStock) routeValues["lowStock"] = "true";
+}
+
+<div class="admin-page-head">
+    <div>
+        <p class="admin-eyebrow">Catalogue</p>
+        <h2>Books</h2>
+        <p>@Model.TotalCount titles in the store, archived ones included.</p>
+    </div>
+
+    <a class="btn btn-primary" asp-area="Admin" asp-controller="Books" asp-action="Create">+ New book</a>
+</div>
+
+<div class="toolbar">
+    <form method="get" asp-area="Admin" asp-controller="Books" asp-action="Index" class="inline-form">
+        <input class="input" name="q" type="search" value="@search" placeholder="Search by title or ISBN" style="min-block-size: 42px; min-inline-size: 280px" />
+        <label class="check-row">
+            <input type="checkbox" name="lowStock" value="true" checked="@lowStock" /> Low stock only
+        </label>
+        <button class="btn btn-secondary btn-sm" type="submit">Search</button>
+    </form>
+</div>
+
+@if (Model.Items.Count == 0)
+{
+    <div class="empty-state">
+        <h2>No books match that search</h2>
+        <p>Try a different title, ISBN or clear the filters.</p>
+    </div>
+}
+else
+{
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th class="num">Price</th>
+                    <th class="num">Stock</th>
+                    <th class="num">Rating</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model.Items)
+                {
+                    <tr>
+                        <td>
+                            <div class="admin-book-cell">
+                                @if (!string.IsNullOrWhiteSpace(book.CoverImageUrl))
+                                {
+                                    <img src="@book.CoverImageUrl" alt="Cover of @book.Title" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <span class="thumb" aria-hidden="true"></span>
+                                }
+                                <span>
+                                    <strong>@book.Title</strong>
+                                    <small>@book.CategoryName</small>
+                                </span>
+                            </div>
+                        </td>
+                        <td>@book.AuthorName</td>
+                        <td>@book.CategoryName</td>
+                        <td class="num">EGP @book.EffectivePrice.ToString("N2")</td>
+                        <td class="num">@book.Stock</td>
+                        <td class="num">
+                            @if (book.ReviewCount > 0)
+                            {
+                                <span class="admin-rating">★ @book.AverageRating.ToString("0.0")</span>
+                                <span class="cart-line-meta">(@book.ReviewCount)</span>
+                            }
+                            else
+                            {
+                                <span class="cart-line-meta">—</span>
+                            }
+                        </td>
+                        <td>
+                            @if (book.Stock <= 0)
+                            {
+                                <span class="badge badge-danger">Sold out</span>
+                            }
+                            else if (book.Stock <= 10)
+                            {
+                                <span class="badge badge-warning">Low</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-success">In stock</span>
+                            }
+                        </td>
+                        <td class="inline-form">
+                            <a asp-area="Admin" asp-controller="Books" asp-action="Edit" asp-route-id="@book.Id">Edit</a>
+
+                            <form method="post" asp-area="Admin" asp-controller="Books" asp-action="Delete" class="inline-form"
+                                  onsubmit="return confirm('Archive this book? Orders keep their history.');">
+                                <input type="hidden" name="id" value="@book.Id" />
+                                <button class="link-button" type="submit">Archive</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_Pagination" model="@(new PaginationInfo
+             {
+                 Page = Model.Page,
+                 TotalPages = Model.TotalPages,
+                 Action = "Index",
+                 Controller = "Books",
+                 Area = "Admin",
+                 RouteValues = routeValues
+             })" />
+}

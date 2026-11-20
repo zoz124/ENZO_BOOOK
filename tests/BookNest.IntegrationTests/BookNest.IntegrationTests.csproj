@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="2.6.*" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.*" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.*" />
+    <PackageReference Include="FluentAssertions" Version="6.12.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.*" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.17.0" />
+    <PackageReference Include="Respawn" Version="6.1.*" />
+    <PackageReference Include="AngleSharp" Version="1.10.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BookNest.Web\BookNest.Web.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,142 @@
+@model AdminBookFormViewModel
+
+@{
+    var isEdit = Model.Id is > 0;
+    ViewData["Title"] = isEdit ? "Edit book" : "New book";
+}
+
+<div class="admin-page-head">
+    <div>
+        <p class="admin-eyebrow">Catalogue</p>
+        <h2>@(isEdit ? Model.Title : "Add a new title")</h2>
+        <p>@(isEdit ? "Update the details customers see in the store." : "Fill in the book details, pricing and cover.")</p>
+    </div>
+
+    <a class="btn btn-secondary" asp-area="Admin" asp-controller="Books" asp-action="Index">← All books</a>
+</div>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div asp-validation-summary="All" class="alert alert-error" role="alert"></div>
+}
+
+<form method="post" asp-area="Admin" asp-controller="Books" asp-action="Save" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CoverImageUrl" />
+
+    <div class="admin-split">
+        <div>
+            <section class="card" style="margin-block-end: var(--space-6)">
+                <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Book details</h2></div>
+
+                <div class="form-grid">
+                    <div class="field full">
+                        <label asp-for="Title">Title</label>
+                        <input class="input" asp-for="Title" maxlength="150" />
+                        <span asp-validation-for="Title" class="field-error"></span>
+                    </div>
+
+                    <div class="field">
+                        <label asp-for="Isbn">ISBN (13 digits)</label>
+                        <input class="input" asp-for="Isbn" maxlength="13" />
+                        <span asp-validation-for="Isbn" class="field-error"></span>
+                    </div>
+
+                    <div class="field">
+                        <label asp-for="AuthorId">Author</label>
+                        <select class="input" asp-for="AuthorId">
+                            <option value="0">Choose…</option>
+                            @foreach (var author in Model.Authors)
+                            {
+                                <option value="@author.Id" selected="@(Model.AuthorId == author.Id)">@author.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="AuthorId" class="field-error"></span>
+                    </div>
+
+                    <div class="field">
+                        <label asp-for="CategoryId">Category</label>
+                        <select class="input" asp-for="CategoryId">
+                            <option value="0">Choose…</option>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category.Id" selected="@(Model.CategoryId == category.Id)">@category.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CategoryId" class="field-error"></span>
+                    </div>
+
+                    <div class="field">
+                        <label asp-for="Publisher">Publisher</label>
+                        <input class="input" asp-for="Publisher" maxlength="100" />
+                    </div>
+
+                    <div class="field">
+                        <label asp-for="Language">Language</label>
+                        <input class="input" asp-for="Language" maxlength="10" />
+                    </div>
+
+                    <div class="field">
+                        <label asp-for="Pages">Pages</label>
+                        <input class="input" asp-for="Pages" type="number" min="1" />
+                    </div>
+
+                    <div class="field">
+                        <label asp-for="PublishedDate">Published on</label>
+                        <input class="input" asp-for="PublishedDate" type="date" />
+                    </div>
+
+                    <div class="field full">
+                        <label asp-for="Description">Description</label>
+                        <textarea class="input" asp-for="Description" rows="6" maxlength="2000"></textarea>
+                        <span class="field-hint">Shown on the book page. Up to 2000 characters.</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <aside>
+            <section class="card">
+                <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Pricing &amp; stock</h2></div>
+
+                <div class="field">
+                    <label asp-for="Price">Price (EGP)</label>
+                    <input class="input" asp-for="Price" type="number" min="1" step="0.01" />
+                    <span asp-validation-for="Price" class="field-error"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="DiscountPrice">Discount price (EGP)</label>
+                    <input class="input" asp-for="DiscountPrice" type="number" min="0" step="0.01" />
+                    <span asp-validation-for="DiscountPrice" class="field-error"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="Stock">Copies in stock</label>
+                    <input class="input" asp-for="Stock" type="number" min="0" />
+                    <span asp-validation-for="Stock" class="field-error"></span>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Cover</h2></div>
+
+                <div class="field">
+                    <label asp-for="Cover">JPG, PNG or WebP — up to 2 MB</label>
+                    <input class="input" asp-for="Cover" type="file" accept="image/jpeg,image/png,image/webp" />
+                    <span asp-validation-for="Cover" class="field-error"></span>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.CoverImageUrl))
+                    {
+                        <span class="field-hint">Current cover: <a href="@Model.CoverImageUrl" target="_blank" rel="noopener">open image ↗</a></span>
+                    }
+                </div>
+            </section>
+
+            <div class="form-actions" style="margin-block-start: 0">
+                <button class="btn btn-primary" type="submit">@(isEdit ? "Save changes" : "Add book")</button>
+                <a class="btn btn-secondary" asp-area="Admin" asp-controller="Books" asp-action="Index">Cancel</a>
+            </div>
+        </aside>
+    </div>
+</form>

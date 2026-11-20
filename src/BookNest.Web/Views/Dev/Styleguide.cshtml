@@ -1,0 +1,175 @@
+@{
+    ViewData["Title"] = "Styleguide";
+}
+
+<div class="admin-page-head">
+    <div>
+        <p class="admin-eyebrow">Development</p>
+        <h2>Enzo Book styleguide</h2>
+        <p>Every component in one place. Development only — returns 404 in production.</p>
+    </div>
+</div>
+
+<section class="section">
+    <div class="section-head">
+        <div><p class="eyebrow">Type</p><h2>Editorial headings</h2></div>
+    </div>
+    <h1>Read something worth keeping</h1>
+    <p style="max-inline-size: 60ch; color: var(--ink-muted)">
+        Body copy is set in Inter at 16px with generous leading. Display headings use Playfair Display,
+        the same serif that carries the Enzo Book wordmark.
+    </p>
+    <p class="eyebrow">Eyebrow label</p>
+</section>
+
+<section class="section">
+    <div class="section-head"><div><p class="eyebrow">Actions</p><h2>Buttons</h2></div></div>
+    <div class="toolbar">
+        <button class="btn btn-primary" type="button">Primary</button>
+        <button class="btn btn-secondary" type="button">Secondary</button>
+        <button class="btn btn-ghost" type="button">Ghost</button>
+        <button class="btn btn-danger" type="button">Danger</button>
+        <button class="btn btn-primary" type="button" disabled>Disabled</button>
+    </div>
+    <div class="toolbar">
+        <button class="btn btn-secondary btn-sm" type="button">Small</button>
+        <button class="btn btn-secondary" type="button">Medium</button>
+        <button class="btn btn-secondary btn-lg" type="button">Large</button>
+        <button class="btn btn-light" type="button">On dark</button>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-head"><div><p class="eyebrow">Status</p><h2>Badges</h2></div></div>
+    <div class="toolbar">
+        <span class="badge badge-success">In stock</span>
+        <span class="badge badge-warning">3 left</span>
+        <span class="badge badge-danger">Sold out</span>
+        <span class="badge badge-info">New</span>
+        <partial name="_StatusBadge" model="OrderStatus.Pending" />
+        <partial name="_StatusBadge" model="OrderStatus.Processing" />
+        <partial name="_StatusBadge" model="OrderStatus.Shipped" />
+        <partial name="_StatusBadge" model="OrderStatus.Delivered" />
+        <partial name="_StatusBadge" model="OrderStatus.Cancelled" />
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-head"><div><p class="eyebrow">Forms</p><h2>Fields</h2></div></div>
+    <form method="post" asp-controller="Dev" asp-action="Styleguide" onsubmit="return false">
+        <div class="form-grid">
+            <div class="field">
+                <label for="demo-name">Input</label>
+                <input class="input" id="demo-name" placeholder="The Cairo Trilogy" />
+                <span class="field-hint">Helper text sits under the field.</span>
+            </div>
+            <div class="field">
+                <label for="demo-error">Input with error</label>
+                <input class="input" id="demo-error" aria-invalid="true" value="12" />
+                <span class="field-error">Enter a valid value.</span>
+            </div>
+            <div class="field">
+                <label for="demo-select">Select</label>
+                <select class="input" id="demo-select">
+                    <option>All books</option>
+                    <option>In stock only</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="demo-disabled">Disabled</label>
+                <input class="input" id="demo-disabled" disabled value="Unavailable" />
+            </div>
+        </div>
+    </form>
+</section>
+
+<section class="section">
+    <div class="section-head"><div><p class="eyebrow">Feedback</p><h2>Alerts</h2></div></div>
+    <div class="alert alert-success" role="status">Added to your bag.</div>
+    <div class="alert alert-error" role="alert">That quantity is larger than the stock available.</div>
+    <div class="alert alert-warning" role="status">Only 3 copies left.</div>
+</section>
+
+<section class="section">
+    <div class="section-head"><div><p class="eyebrow">Data</p><h2>Tables</h2></div></div>
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr><th>Order</th><th>Customer</th><th class="num">Total</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>BN-20260101-A1B2C3</td><td>Demo customer</td><td class="num">EGP 450.00</td><td><partial name="_StatusBadge" model="OrderStatus.Pending" /></td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-head"><div><p class="eyebrow">Admin</p><h2>Stat cards</h2></div></div>
+    <div class="stat-grid">
+        <div class="stat-card stat-card--primary">
+            <p class="stat-label">Total sales</p>
+            <p class="stat-value">EGP 48,200</p>
+            <p class="stat-label stat-foot">Excluding cancelled</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">Orders</p>
+            <p class="stat-value">126</p>
+            <p class="stat-label stat-foot">8 pending review</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">Low stock</p>
+            <p class="stat-value">4</p>
+            <p class="stat-label stat-foot">10 copies or fewer</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">Days with sales</p>
+            <p class="stat-value">27</p>
+            <p class="stat-label stat-foot">of the last 30</p>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-head"><div><p class="eyebrow">States</p><h2>Empty state</h2></div></div>
+    <div class="empty-state">
+        <h2>No results</h2>
+        <p>Try another search term or clear the filters.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-head"><div><p class="eyebrow">Navigation</p><h2>Pagination</h2></div></div>
+    <partial name="_Pagination" model="@(new PaginationInfo { Page = 2, TotalPages = 5, Action = "Styleguide", Controller = "Dev" })" />
+</section>
+
+<section class="section">
+    <div class="section-head"><div><p class="eyebrow">Loading</p><h2>Skeletons</h2></div></div>
+    <div class="book-grid">
+        @for (var i = 0; i < 4; i++)
+        {
+            <div class="skeleton skeleton-card"></div>
+        }
+    </div>
+    <div class="skeleton skeleton-line" style="margin-block-start: var(--space-4)"></div>
+    <div class="skeleton skeleton-line short"></div>
+</section>
+
+<section class="section">
+    <div class="section-head"><div><p class="eyebrow">Overlay</p><h2>Modal</h2></div></div>
+    <button class="btn btn-secondary" type="button" onclick="document.getElementById('demo-modal').showModal()">Open modal</button>
+
+    <dialog class="modal" id="demo-modal">
+        <div class="modal-head">
+            <h2>Confirm archive</h2>
+            <button class="modal-close" type="button" onclick="document.getElementById('demo-modal').close()" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
+            <p>Archiving is a soft delete — past orders keep their history.</p>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" type="button" onclick="document.getElementById('demo-modal').close()">Cancel</button>
+            <button class="btn btn-danger" type="button">Archive book</button>
+        </div>
+    </dialog>
+</section>

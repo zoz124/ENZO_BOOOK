@@ -1,0 +1,84 @@
+@model AdminOrdersViewModel
+
+@{
+    ViewData["Title"] = "Orders";
+    var search = ViewData["Search"] as string;
+
+    var routeValues = new Dictionary<string, string>();
+    if (!string.IsNullOrWhiteSpace(search)) routeValues["q"] = search;
+    if (Model.Status.HasValue) routeValues["status"] = Model.Status.Value.ToString();
+}
+
+<div class="admin-page-head">
+    <div>
+        <p class="admin-eyebrow">Operations</p>
+        <h2>Orders</h2>
+        <p>@Model.Orders.TotalCount orders@(Model.Status.HasValue ? $" in {Model.Status}" : "") — newest first.</p>
+    </div>
+</div>
+
+<div class="toolbar">
+    <form method="get" asp-area="Admin" asp-controller="Orders" asp-action="Index" class="inline-form">
+        <input class="input" name="q" type="search" value="@search" placeholder="Order number or customer email" style="min-block-size: 42px; min-inline-size: 300px" />
+
+        <select class="input" name="status" style="min-block-size: 42px; min-inline-size: 170px">
+            <option value="">All statuses</option>
+            @foreach (var status in Enum.GetValues<OrderStatus>())
+            {
+                <option value="@status" selected="@(Model.Status == status)">@status</option>
+            }
+        </select>
+
+        <button class="btn btn-secondary btn-sm" type="submit">Filter</button>
+    </form>
+</div>
+
+@if (Model.Orders.Items.Count == 0)
+{
+    <div class="empty-state">
+        <h2>No orders found</h2>
+        <p>Try a different search term or status.</p>
+    </div>
+}
+else
+{
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th class="num">Items</th>
+                    <th class="num">Total</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders.Items)
+                {
+                    <tr>
+                        <td>@order.OrderNumber</td>
+                        <td>@order.CustomerName</td>
+                        <td class="cart-line-meta">@order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
+                        <td class="num">@order.ItemCount</td>
+                        <td class="num">EGP @order.Total.ToString("N2")</td>
+                        <td><partial name="_StatusBadge" model="order.Status" /></td>
+                        <td><a asp-area="Admin" asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id">Details</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_Pagination" model="@(new PaginationInfo
+             {
+                 Page = Model.Orders.Page,
+                 TotalPages = Model.Orders.TotalPages,
+                 Action = "Index",
+                 Controller = "Orders",
+                 Area = "Admin",
+                 RouteValues = routeValues
+             })" />
+}

@@ -1,0 +1,125 @@
+@model OrderDetailsViewModel
+
+@{
+    var order = Model.Order;
+    ViewData["Title"] = $"Order {order.OrderNumber}";
+}
+
+<div class="admin-page-head">
+    <div>
+        <p class="admin-eyebrow">Operations · @order.Status</p>
+        <h2>Order @order.OrderNumber</h2>
+        <p>Placed @order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm") by @order.CustomerName.</p>
+    </div>
+
+    <a class="btn btn-secondary" asp-area="Admin" asp-controller="Orders" asp-action="Index">← All orders</a>
+</div>
+
+<div class="admin-split">
+    <div>
+        <section class="card" style="margin-block-end: var(--space-6)">
+            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Customer &amp; payment</h2></div>
+
+            <div class="summary-row"><span>Status</span><span><partial name="_StatusBadge" model="order.Status" /></span></div>
+            <div class="summary-row"><span>Customer</span><span>@order.CustomerName — @order.CustomerEmail</span></div>
+            <div class="summary-row">
+                <span>Payment</span>
+                <span>
+                    @order.PaymentLabel
+                    @if (order.PaymentMethod == "Visa")
+                    {
+                        <span class="badge badge-info">Card</span>
+                    }
+                    else
+                    {
+                        <span class="badge">On delivery</span>
+                    }
+                </span>
+            </div>
+            <div class="summary-row"><span>Shipping to</span><span>@order.ShippingCity</span></div>
+        </section>
+
+        <section class="card" style="margin-block-end: var(--space-6)">
+            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Shipping address</h2></div>
+            <p class="cart-line-meta" style="margin: 0; line-height: var(--line-height-en)">
+                @order.ShippingName<br />
+                @order.ShippingPhone<br />
+                @order.ShippingCity — @order.ShippingAddress
+                @if (!string.IsNullOrWhiteSpace(order.ShippingPostalCode))
+                {
+                    <text><br />@order.ShippingPostalCode</text>
+                }
+            </p>
+        </section>
+
+        <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Items</h2></div>
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr><th>Book</th><th>ISBN</th><th class="num">Unit price</th><th class="num">Qty</th><th class="num">Total</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var line in order.Lines)
+                    {
+                        <tr>
+                            <td>@line.BookTitle</td>
+                            <td class="cart-line-meta">@line.BookIsbn</td>
+                            <td class="num">EGP @line.UnitPrice.ToString("N2")</td>
+                            <td class="num">@line.Quantity</td>
+                            <td class="num">EGP @line.Subtotal.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <section class="card" style="margin-block-start: var(--space-6)">
+            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Status history</h2></div>
+            <ul class="timeline">
+                @foreach (var change in order.History)
+                {
+                    <li>
+                        <partial name="_StatusBadge" model="change.To" />
+                        <span class="cart-line-meta">
+                            @change.ChangedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                            @if (!string.IsNullOrWhiteSpace(change.Notes))
+                            {
+                                <text> — @change.Notes</text>
+                            }
+                        </span>
+                    </li>
+                }
+            </ul>
+        </section>
+    </div>
+
+    <aside>
+        <section class="card">
+            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Summary</h2></div>
+            <div class="summary-row"><span>Subtotal</span><span>EGP @order.Subtotal.ToString("N2")</span></div>
+            <div class="summary-row"><span>Shipping</span><span>EGP @order.ShippingCost.ToString("N2")</span></div>
+            <div class="summary-row summary-total"><span>Total</span><span>EGP @order.Total.ToString("N2")</span></div>
+
+            @if (Model.AllowedNext.Count > 0)
+            {
+                <form method="post" asp-area="Admin" asp-controller="Orders" asp-action="ChangeStatus" style="margin-block-start: var(--space-6)">
+                    <input type="hidden" name="id" value="@order.Id" />
+                    <div class="field">
+                        <label for="newStatus">Move to</label>
+                        <select class="input" id="newStatus" name="newStatus">
+                            @foreach (var next in Model.AllowedNext)
+                            {
+                                <option value="@next">@next</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="note">Note (optional)</label>
+                        <input class="input" id="note" name="note" placeholder="Visible in the order timeline" maxlength="500" />
+                    </div>
+                    <button class="btn btn-primary" style="inline-size: 100%" type="submit">Update status</button>
+                </form>
+            }
+        </section>
+    </aside>
+</div>

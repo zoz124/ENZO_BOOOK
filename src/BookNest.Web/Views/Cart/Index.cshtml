@@ -1,0 +1,126 @@
+@model CartSummary
+
+@{
+    ViewData["Title"] = "Shopping bag";
+}
+
+<div class="container">
+    <div class="bag-head">
+        <span class="eyebrow">Your selection</span>
+        <h1>Shopping bag <sup>@Model.TotalItems</sup></h1>
+    </div>
+
+    @if (Model.IsEmpty)
+    {
+        <div class="empty-state" style="margin-block: var(--space-8) var(--space-24)">
+            <h2>Your bag is empty</h2>
+            <p>Start with the books our readers love most.</p>
+            <a class="btn btn-primary" asp-controller="Books" asp-action="Index">Browse books</a>
+        </div>
+    }
+    else
+    {
+        <div class="bag-layout">
+            <div class="bag-lines">
+                @foreach (var line in Model.Lines)
+                {
+                    <div class="bag-line">
+                        <a class="bag-thumb" asp-controller="Books" asp-action="Details" asp-route-id="@line.BookId" aria-label="@line.Title">
+                            @if (!string.IsNullOrWhiteSpace(line.CoverImageUrl))
+                            {
+                                <img src="@line.CoverImageUrl" alt="Cover of @line.Title" />
+                            }
+                            else
+                            {
+                                <span class="bag-thumb-fallback">@line.Title</span>
+                            }
+                        </a>
+
+                        <div class="bag-meta">
+                            <span class="cat">Paperback</span>
+                            <h2><a asp-controller="Books" asp-action="Details" asp-route-id="@line.BookId">@line.Title</a></h2>
+                            <p>@line.AuthorName</p>
+                            <p class="bag-stock">
+                                @if (!line.IsAvailable)
+                                {
+                                    <span class="stock-badge is-out">Only @line.Stock left</span>
+                                }
+                                else
+                                {
+                                    <span>@line.UnitPrice.ToString("N2") EGP each</span>
+                                }
+                            </p>
+
+                            <form method="post" asp-controller="Cart" asp-action="Remove" class="inline-form">
+                                <input type="hidden" name="bookId" value="@line.BookId" />
+                                <button class="link-button" type="submit">Remove</button>
+                            </form>
+                        </div>
+
+                        <form method="post" asp-controller="Cart" asp-action="Update" class="bag-qty">
+                            <input type="hidden" name="bookId" value="@line.BookId" />
+                            <button class="qty-step" type="submit" name="quantity" value="@(line.Quantity - 1)"
+                                    aria-label="Decrease quantity">−</button>
+                            <span class="qty-value" aria-label="Quantity">@line.Quantity</span>
+                            <button class="qty-step" type="submit" name="quantity" value="@(line.Quantity + 1)"
+                                    aria-label="Increase quantity">+</button>
+                        </form>
+
+                        <p class="bag-price">EGP @line.LineTotal.ToString("N2")</p>
+                    </div>
+                }
+            </div>
+
+            <form method="get" asp-controller="Checkout" asp-action="Index" class="bag-summary">
+                <h2>Order summary</h2>
+
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>EGP @Model.Subtotal.ToString("N2")</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>@(Model.Shipping == 0 ? "Free" : $"EGP {Model.Shipping:N2}")</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span>Total</span>
+                    <span>EGP @Model.Total.ToString("N2")</span>
+                </div>
+
+                <fieldset class="pay-options">
+                    <legend>Payment</legend>
+
+                    <label class="pay-option">
+                        <input type="radio" name="paymentMethod" value="Cash" checked />
+                        <span class="pay-option-body">
+                            <strong>Cash on delivery</strong>
+                            <small>Pay the courier when your books arrive</small>
+                        </span>
+                    </label>
+
+                    <label class="pay-option">
+                        <input type="radio" name="paymentMethod" value="Visa" />
+                        <span class="pay-option-body">
+                            <strong>Visa / card</strong>
+                            <small>Card details are confirmed at checkout</small>
+                        </span>
+                    </label>
+                </fieldset>
+
+                <button class="btn btn-primary bag-checkout" type="submit">
+                    Secure checkout
+                    <span aria-hidden="true">→</span>
+                </button>
+
+                <p class="bag-note">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="4" y="10" width="16" height="10" rx="1" />
+                        <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                    </svg>
+                    Secure checkout · Free shipping over EGP 500
+                </p>
+            </form>
+        </div>
+    }
+</div>

@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release /p:TreatWarningsAsErrors=true
+
+    - name: Run Unit Tests
+      run: dotnet test tests/BookNest.UnitTests --no-build --configuration Release --logger "trx;LogFileName=unit-tests.trx" --collect:"XPlat Code Coverage"
+
+    - name: Run Architecture Tests
+      run: dotnet test tests/BookNest.ArchitectureTests --no-build --configuration Release --logger "trx;LogFileName=arch-tests.trx"
+
+    - name: Run Integration Tests
+      run: dotnet test tests/BookNest.IntegrationTests --no-build --configuration Release --logger "trx;LogFileName=integration-tests.trx"
+      env:
+        ASPNETCORE_ENVIRONMENT: Testing
+
+    - name: Check for vulnerable packages
+      run: |
+        dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerable.txt
+        ! grep -q "has the following vulnerable packages" vulnerable.txt
+
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: '**/*.trx'

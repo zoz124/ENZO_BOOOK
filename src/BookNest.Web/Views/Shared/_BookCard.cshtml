@@ -1,0 +1,142 @@
+@model BookNest.Core.Models.BookCardDto
+
+@{
+    // Typographic covers, exactly like the design: a paper colour per book with
+    // the catalogue lettering printed on it. No photos, no placeholders.
+    var palettes = new[]
+    {
+        ("#F3E8CC", "#183E35"),
+        ("#F6E4DE", "#8A4A3C"),
+        ("#DEE7EA", "#2C4D57"),
+        ("#E7E9DA", "#3C4A33"),
+        ("#EFE3D2", "#6B4B2A"),
+        ("#E3E4EF", "#3C3F63")
+    };
+
+    var (coverBg, coverInk) = palettes[Math.Abs(Model.Id) % palettes.Length];
+    var discountPercent = Model.IsDiscounted && Model.Price > 0
+        ? (int)Math.Round((Model.Price - Model.EffectivePrice) / Model.Price * 100)
+        : 0;
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+
+    var wishlistIds = ViewData["WishlistIds"] as IReadOnlyList<int>;
+    var inWishlist = User.Identity?.IsAuthenticated == true && wishlistIds is not null && wishlistIds.Contains(Model.Id);
+
+    // The card shows the same cover artwork as the detail page, so opening a book
+    // never swaps the image the reader clicked on.
+    var hasCover = !string.IsNullOrWhiteSpace(Model.CoverImageUrl);
+}
+
+<article class="book-card">
+    <div class="book-visual">
+        @if (discountPercent > 0)
+        {
+            <span class="card-badge">@discountPercent% off</span>
+        }
+        else if (Model.Stock <= 0)
+        {
+            <span class="card-badge">Sold out</span>
+        }
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <form method="post" asp-controller="Wishlist" asp-action="@(inWishlist ? "Remove" : "Add")" class="card-fav-form">
+                <input type="hidden" name="bookId" value="@Model.Id" />
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                <button class="card-fav @(inWishlist ? "is-on" : null)" type="submit"
+                        aria-pressed="@(inWishlist ? "true" : "false")"
+                        aria-label="@(inWishlist ? $"Remove {Model.Title} from your wishlist" : $"Save {Model.Title} to your wishlist")">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="@(inWishlist ? "currentColor" : "none")"
+                         stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.4 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+                    </svg>
+                </button>
+            </form>
+        }
+        else
+        {
+            <a class="card-fav" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl"
+               aria-label="Sign in to save @Model.Title">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.4 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+                </svg>
+            </a>
+        }
+
+        <a class="book-cover @(hasCover ? "has-cover" : null)" asp-controller="Books" asp-action="Details" asp-route-id="@Model.Id"
+           style="@(hasCover ? null : $"background:{coverBg}; color:{coverInk}")" aria-label="@Model.Title">
+            @if (hasCover)
+            {
+                <img src="@Model.CoverImageUrl" alt="Cover of @Model.Title" loading="lazy" />
+            }
+            else
+            {
+                <div class="cover-mark">E</div>
+                <div class="cover-copy">
+                    <span>@Model.CategoryName</span>
+                    <strong>@Model.Title</strong>
+                    <em>@Model.AuthorName</em>
+                </div>
+                <div class="cover-lines"></div>
+            }
+        </a>
+
+        <form method="post" asp-controller="Cart" asp-action="Add" class="quick-add-form">
+            <input type="hidden" name="bookId" value="@Model.Id" />
+            <input type="hidden" name="quantity" value="1" />
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            <button class="quick-add" type="submit" disabled="@(Model.Stock <= 0)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M5 8h14l-1 13H6L5 8Z" />
+                    <path d="M9 10V6a3 3 0 0 1 6 0v4" />
+                </svg>
+                Add to cart
+            </button>
+        </form>
+    </div>
+
+    <div class="book-info">
+        <span class="cat">@Model.CategoryName</span>
+
+        <h3>
+            <a asp-controller="Books" asp-action="Details" asp-route-id="@Model.Id">@Model.Title</a>
+        </h3>
+
+        <p class="author">@Model.AuthorName</p>
+
+        @if (Model.HasReviews)
+        {
+            <p class="card-rating">
+                <span class="stars" aria-hidden="true">@Stars(Model.AverageRating)</span>
+                <span>@Model.AverageRating.ToString("0.0")</span>
+                <span class="card-rating-count">(@Model.ReviewCount)</span>
+            </p>
+        }
+
+        <div class="price-row">
+            <strong>EGP @Model.EffectivePrice.ToString("N0")</strong>
+
+            @if (Model.IsDiscounted)
+            {
+                <del>EGP @Model.Price.ToString("N0")</del>
+            }
+
+            @if (Model.Stock <= 0)
+            {
+                <span class="note">Out of stock</span>
+            }
+            else
+            {
+                <span class="note">@Model.Stock left</span>
+            }
+        </div>
+    </div>
+</article>
+
+@functions {
+    private static string Stars(double value)
+    {
+        var filled = Math.Clamp((int)Math.Round(value), 0, 5);
+        return new string('★', filled) + new string('☆', 5 - filled);
+    }
+}

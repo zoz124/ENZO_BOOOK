@@ -1,0 +1,73 @@
+@model IReadOnlyList<BookNest.Core.Entities.Category>
+
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="admin-page-head">
+    <div>
+        <p class="admin-eyebrow">Catalogue</p>
+        <h2>Categories</h2>
+        <p>@Model.Count categories organise the shelves of the store.</p>
+    </div>
+</div>
+
+<div class="admin-split">
+    <div>
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr><th>Name</th><th>Arabic name</th><th>Slug</th><th class="num">Books</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var category in Model)
+                    {
+                        <tr>
+                            <td>@category.Name</td>
+                            <td>@category.NameAr</td>
+                            <td class="cart-line-meta">@category.Slug</td>
+                            <td class="num">@category.Books.Count</td>
+                            <td>
+                                <form method="post" asp-area="Admin" asp-controller="Categories" asp-action="Delete" class="inline-form"
+                                      onsubmit="return confirm('Delete this category?');">
+                                    <input type="hidden" name="id" value="@category.Id" />
+                                    <button class="link-button" type="submit">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <aside>
+        <section class="card">
+            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">New category</h2></div>
+
+            <form method="post" asp-area="Admin" asp-controller="Categories" asp-action="Save">
+                <div class="field">
+                    <label for="Name">Name (English)</label>
+                    <input class="input" id="Name" name="Name" required maxlength="100" />
+                </div>
+                <div class="field">
+                    <label for="NameAr">Arabic name</label>
+                    <input class="input" id="NameAr" name="NameAr" maxlength="100" dir="rtl" lang="ar" />
+                </div>
+                <div class="field">
+                    <label for="Description">Description</label>
+                    <input class="input" id="Description" name="Description" maxlength="500" />
+                </div>
+
+                <button class="btn btn-primary" style="inline-size: 100%" type="submit">Add category</button>
+            </form>
+        </section>
+
+        <div class="card">
+            <p class="eyebrow">Rule BR-03</p>
+            <p class="cart-line-meta" style="margin-block-start: var(--space-2)">
+                A category that still holds books cannot be deleted — move or archive those titles first.
+            </p>
+        </div>
+    </aside>
+</div>

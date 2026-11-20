@@ -1,0 +1,158 @@
+@model HomePageDto
+@{
+    ViewData["Title"] = "Curated bookstore";
+    var feature = Model.BestSellers.FirstOrDefault() ?? Model.Newest.FirstOrDefault();
+    // Favour bestsellers, then top up with new arrivals so the shelf is never
+    // a lone book (a store with one past order would otherwise show one card).
+    var showcase = Model.BestSellers
+        .Concat(Model.Newest)
+        .GroupBy(book => book.Id)
+        .Select(group => group.First())
+        .Take(4)
+        .ToList();
+}
+
+<section class="hero">
+    <div class="hero-copy">
+        <span class="eyebrow">Curated for curious minds</span>
+
+        <h1>Stories that stay<br />with <em>you.</em></h1>
+
+        <p>
+            Discover thoughtfully selected books that inspire new ideas, spark imagination,
+            and make every quiet moment count.
+        </p>
+
+        <div class="hero-buttons">
+            <a class="btn btn-primary" asp-controller="Books" asp-action="Index">
+                Explore books
+                <span class="btn-arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="text-link" asp-controller="Home" asp-action="Index" asp-fragment="story">Our story</a>
+        </div>
+
+        <div class="hero-proof">
+            <div class="avatars" aria-hidden="true">
+                <span class="avatar">JM</span>
+                <span class="avatar">AL</span>
+                <span class="avatar">SK</span>
+            </div>
+            <div>
+                <span class="stars" aria-hidden="true">★★★★★</span>
+                <small>Loved by readers across Egypt</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-art">
+        <img src="~/images/library-hero.jpg" alt="Open book floating above the shelves of a library" />
+        <span class="hero-rosette" aria-hidden="true">Enzo<br />est.<br />2024</span>
+
+        @if (feature is not null)
+        {
+            <div class="hero-card">
+                <span>Editor's pick</span>
+                <strong>@feature.Title</strong>
+                <a asp-controller="Books" asp-action="Details" asp-route-id="@feature.Id">
+                    Discover it
+                    <span aria-hidden="true">→</span>
+                </a>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="trust-row" aria-label="Why shop with Enzo">
+    <div class="trust-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 6h11v11H3zM14 10h4l3 3v4h-7z" />
+            <circle cx="7" cy="19" r="2" />
+            <circle cx="18" cy="19" r="2" />
+        </svg>
+        <span><strong>Free delivery</strong><small>On orders over EGP 500</small></span>
+    </div>
+
+    <div class="trust-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3 4 6v5c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-3Z" />
+        </svg>
+        <span><strong>Secure payment</strong><small>100% protected checkout</small></span>
+    </div>
+
+    <div class="trust-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.4 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+        </svg>
+        <span><strong>Curated with care</strong><small>Books worth your time</small></span>
+    </div>
+
+    <div class="trust-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14" />
+            <path d="m14 7 5 5-5 5" />
+        </svg>
+        <span><strong>Easy returns</strong><small>30-day return policy</small></span>
+    </div>
+</section>
+
+@if (showcase.Count > 0)
+{
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Worth your time</span>
+                    <h2>Reader favorites</h2>
+                </div>
+                <a class="text-link" asp-controller="Books" asp-action="Index" asp-route-sort="@CatalogSort.BestSelling">
+                    View all books
+                    <span aria-hidden="true">→</span>
+                </a>
+            </div>
+
+            <div class="book-grid">
+                @foreach (var book in showcase)
+                {
+                    <partial name="_BookCard" model="book" />
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<section class="manifesto" id="story">
+    <div class="manifesto-image">
+        <img src="~/images/reading-manifesto.jpg" alt="A reader holding an open book" />
+        <span class="manifesto-badge" aria-hidden="true">Thoughtfully<br />selected</span>
+    </div>
+
+    <div class="manifesto-copy">
+        <span class="eyebrow">More than a bookstore</span>
+        <h2>Books are not just things we read. They're <em>places we go.</em></h2>
+        <p>
+            At Enzo, every title earns its place. We seek out books with the power to shift
+            perspectives, nurture curiosity, and stay with you long after the final page.
+        </p>
+        <a class="btn btn-cream" asp-controller="Books" asp-action="Index">
+            Read our story
+            <span class="btn-arrow" aria-hidden="true">→</span>
+        </a>
+    </div>
+</section>
+
+<section class="newsletter">
+    <div class="container">
+        <span class="eyebrow">The Enzo edit</span>
+        <h2>Good books. Better inbox.</h2>
+        <p>Fresh recommendations and thoughtful reads, delivered twice a month.</p>
+
+        <form asp-controller="Account" asp-action="Register" method="get">
+            <label class="visually-hidden" for="newsletter-email">Your email address</label>
+            <input id="newsletter-email" type="email" name="email" placeholder="Your email address" />
+            <button class="btn btn-primary" type="submit">
+                Join the list
+                <span aria-hidden="true">→</span>
+            </button>
+        </form>
+    </div>
+</section>

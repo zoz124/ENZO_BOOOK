@@ -1,0 +1,40 @@
+## Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+*.user
+*.suo
+
+## Test results
+TestResults/
+*.trx
+coverage*.xml
+coverage*.json
+
+## IDE
+.vs/
+.idea/
+*.swp
+
+## Local secrets & data
+*.db
+*.mdf
+*.ldf
+appsettings.Local.json
+.env
+.dev.vars
+vulnerable.txt
+
+## OS
+Thumbs.db
+.DS_Store
+
+## Runtime logs (never commit request logs)
+logs/
+server.log
+
+## Tooling / local agent state
+.freebuff/
+.cloud-attachments/

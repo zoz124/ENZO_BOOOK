@@ -1,0 +1,68 @@
+@model IReadOnlyList<BookNest.Core.Entities.Author>
+
+@{
+    ViewData["Title"] = "Authors";
+}
+
+<div class="admin-page-head">
+    <div>
+        <p class="admin-eyebrow">Catalogue</p>
+        <h2>Authors</h2>
+        <p>@Model.Count writers represented in the catalogue.</p>
+    </div>
+</div>
+
+<div class="admin-split">
+    <div>
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr><th>Name</th><th>Biography</th><th class="num">Books</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var author in Model)
+                    {
+                        <tr>
+                            <td>@author.Name</td>
+                            <td class="cart-line-meta">@(author.Biography is null ? "—" : author.Biography.Length > 60 ? author.Biography[..60] + "…" : author.Biography)</td>
+                            <td class="num">@author.Books.Count</td>
+                            <td>
+                                <form method="post" asp-area="Admin" asp-controller="Authors" asp-action="Delete" class="inline-form"
+                                      onsubmit="return confirm('Delete this author?');">
+                                    <input type="hidden" name="id" value="@author.Id" />
+                                    <button class="link-button" type="submit">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <aside>
+        <section class="card">
+            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">New author</h2></div>
+
+            <form method="post" asp-area="Admin" asp-controller="Authors" asp-action="Save">
+                <div class="field">
+                    <label for="Name">Name</label>
+                    <input class="input" id="Name" name="Name" required maxlength="150" />
+                </div>
+                <div class="field">
+                    <label for="Biography">Biography</label>
+                    <textarea class="input" id="Biography" name="Biography" rows="5" maxlength="1000"></textarea>
+                </div>
+
+                <button class="btn btn-primary" style="inline-size: 100%" type="submit">Add author</button>
+            </form>
+        </section>
+
+        <div class="card">
+            <p class="eyebrow">Rule BR-03</p>
+            <p class="cart-line-meta" style="margin-block-start: var(--space-2)">
+                An author who still has books cannot be deleted — archive those titles first.
+            </p>
+        </div>
+    </aside>
+</div>

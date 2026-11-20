@@ -1,0 +1,74 @@
+@model IReadOnlyList<AdminUserDto>
+
+@{
+    ViewData["Title"] = "Customers";
+    var currentId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
+
+<div class="admin-page-head">
+    <div>
+        <p class="admin-eyebrow">Operations</p>
+        <h2>Customers</h2>
+        <p>@Model.Count accounts, including administrators.</p>
+    </div>
+</div>
+
+<div class="table-wrapper">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Roles</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                var isSelf = user.Id == currentId;
+                var isAdmin = user.Roles.Contains("Admin");
+
+                <tr>
+                    <td>@user.Email @if (isSelf) { <span class="badge badge-info">You</span> }</td>
+                    <td>@(string.IsNullOrWhiteSpace(user.FullName) ? "—" : user.FullName)</td>
+                    <td>@string.Join(", ", user.Roles)</td>
+                    <td>
+                        @if (user.IsActive)
+                        {
+                            <span class="badge badge-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-danger">Disabled</span>
+                        }
+                    </td>
+                    <td class="cart-line-meta">@user.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                    <td class="inline-form">
+                        <form method="post" asp-area="Admin" asp-controller="Users" asp-action="ToggleActive" class="inline-form">
+                            <input type="hidden" name="id" value="@user.Id" />
+                            <input type="hidden" name="isActive" value="@((!user.IsActive).ToString().ToLowerInvariant())" />
+                            <button class="link-button" type="submit" disabled="@isSelf">
+                                @(user.IsActive ? "Disable" : "Enable")
+                            </button>
+                        </form>
+
+                        <form method="post" asp-area="Admin" asp-controller="Users" asp-action="SetRole" class="inline-form">
+                            <input type="hidden" name="id" value="@user.Id" />
+                            <input type="hidden" name="role" value="@(isAdmin ? "Customer" : "Admin")" />
+                            <button class="link-button" type="submit" disabled="@isSelf">
+                                @(isAdmin ? "Revoke admin" : "Make admin")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<p class="cart-line-meta" style="margin-block-start: var(--space-4)">
+    Rule BR-09 — you cannot disable your own account or remove your own admin role; those actions stay disabled on your row.
+</p>

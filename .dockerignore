@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/TestResults/
+**/*.user
+**/.vs/
+**/.idea/
+.git/
+.github/
+logs/
+tests/
+*.md
+*.sql
+!.dockerignore

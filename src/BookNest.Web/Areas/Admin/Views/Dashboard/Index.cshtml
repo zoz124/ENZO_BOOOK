@@ -1,0 +1,218 @@
+@model DashboardStatsDto
+
+@{
+    ViewData["Title"] = "Dashboard";
+    var max = Model.SalesLast30Days.Count > 0 ? Model.SalesLast30Days.Max(d => d.Total) : 1m;
+    if (max <= 0) { max = 1m; }
+    var firstDay = Model.SalesLast30Days.FirstOrDefault();
+    var lastDay = Model.SalesLast30Days.LastOrDefault();
+    var topRevenue = Model.TopBooks.Count > 0 ? Model.TopBooks.Max(b => b.Revenue) : 1m;
+    if (topRevenue <= 0) { topRevenue = 1m; }
+}
+
+<div class="admin-page-head">
+    <div>
+        <p class="admin-eyebrow">Store performance</p>
+        <h2>The month at a glance</h2>
+        <p>Sales, orders, stock health and reader feedback for the last 30 days.</p>
+    </div>
+
+    <div class="inline-form">
+        <span class="admin-chip">@DateTime.Now.ToString("ddd, dd MMM yyyy")</span>
+        <a class="btn btn-secondary btn-sm" asp-area="" asp-controller="Home" asp-action="Index">View storefront ↗</a>
+    </div>
+</div>
+
+<div class="stat-grid stat-grid--five">
+    <div class="stat-card stat-card--primary">
+        <p class="stat-label">Total sales</p>
+        <p class="stat-value">EGP @Model.TotalSales.ToString("N0")</p>
+        <p class="stat-label stat-foot">Excluding cancelled orders</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Orders</p>
+        <p class="stat-value">@Model.OrdersCount</p>
+        <p class="stat-label stat-foot">@Model.NewOrders pending review</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Low stock titles</p>
+        <p class="stat-value">@Model.LowStockBooks.Count</p>
+        <p class="stat-label stat-foot">10 copies or fewer</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Out of stock</p>
+        <p class="stat-value">@Model.OutOfStockCount</p>
+        <p class="stat-label stat-foot">Titles unavailable now</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Reader ratings</p>
+        <p class="stat-value">@Model.ReviewsCount</p>
+        <p class="stat-label stat-foot">Average @Model.AverageRating.ToString("0.0") / 5</p>
+    </div>
+</div>
+
+<section class="admin-section">
+    <div class="section-head">
+        <div>
+            <p class="eyebrow">Revenue</p>
+            <h2>Sales, last 30 days</h2>
+        </div>
+        <span class="cart-line-meta">Peak day: EGP @max.ToString("N0")</span>
+    </div>
+
+    @if (Model.SalesLast30Days.Count == 0)
+    {
+        <div class="empty-state"><p>No sales recorded in this period.</p></div>
+    }
+    else
+    {
+        <div class="chart-bars">
+            @foreach (var day in Model.SalesLast30Days)
+            {
+                var height = (int)Math.Round(day.Total / max * 100);
+                <div class="chart-bar @(day.Total <= 0 ? "is-empty" : null)" style="height:@(Math.Max(height, 2))%" title="@day.Day.ToString("yyyy-MM-dd"): EGP @day.Total.ToString("N0")"></div>
+            }
+        </div>
+        <div class="chart-foot">
+            <span>@firstDay?.Day.ToString("dd MMM")</span>
+            <span>@lastDay?.Day.ToString("dd MMM yyyy")</span>
+        </div>
+    }
+</section>
+
+<div class="admin-split">
+    <section class="admin-section">
+        <div class="section-head">
+            <div>
+                <p class="eyebrow">Catalogue</p>
+                <h2>Top 10 books</h2>
+            </div>
+        </div>
+
+        @if (Model.TopBooks.Count == 0)
+        {
+            <div class="empty-state"><p>No sales yet.</p></div>
+        }
+        else
+        {
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr><th>#</th><th>Book</th><th class="num">Copies</th><th class="num">Revenue</th></tr>
+                    </thead>
+                    <tbody>
+                        @{ var rank = 0; }
+                        @foreach (var book in Model.TopBooks)
+                        {
+                            rank++;
+                            <tr>
+                                <td><span class="rank">@rank.ToString("00")</span></td>
+                                <td>
+                                    @book.Title
+                                    <span class="admin-bar" style="inline-size:@(Math.Round(book.Revenue / topRevenue * 100))%"></span>
+                                </td>
+                                <td class="num">@book.UnitsSold</td>
+                                <td class="num">EGP @book.Revenue.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <div class="section-head" style="margin-block-start: var(--space-8)">
+            <div>
+                <p class="eyebrow">Demand</p>
+                <h2>Category mix</h2>
+            </div>
+        </div>
+
+        @if (Model.CategorySales.Count == 0)
+        {
+            <div class="empty-state"><p>No sales yet.</p></div>
+        }
+        else
+        {
+            <div class="card">
+                @foreach (var category in Model.CategorySales)
+                {
+                    <div class="summary-row">
+                        <span>@category.CategoryName</span>
+                        <span class="cart-line-meta">@category.UnitsSold copies · EGP @category.Revenue.ToString("N0")</span>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+
+    <aside>
+        <section>
+            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Quick actions</h2></div>
+
+            <div class="admin-actions">
+                <a asp-area="Admin" asp-controller="Books" asp-action="Create">
+                    <span>Add a new book</span><span aria-hidden="true">→</span>
+                </a>
+                <a asp-area="Admin" asp-controller="Orders" asp-action="Index" asp-route-status="Pending">
+                    <span>Orders to review (@Model.NewOrders)</span><span aria-hidden="true">→</span>
+                </a>
+                <a asp-area="Admin" asp-controller="Books" asp-action="Index" asp-route-lowStock="true">
+                    <span>Low stock shelf (@Model.LowStockBooks.Count)</span><span aria-hidden="true">→</span>
+                </a>
+                <a asp-area="Admin" asp-controller="Users" asp-action="Index">
+                    <span>Customers</span><span aria-hidden="true">→</span>
+                </a>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Latest reviews</h2></div>
+
+            @if (Model.RecentReviews.Count == 0)
+            {
+                <div class="empty-state"><p>No reviews yet.</p></div>
+            }
+            else
+            {
+                <div class="card admin-reviews">
+                    @foreach (var review in Model.RecentReviews)
+                    {
+                        <div class="admin-review">
+                            <div class="review-top">
+                                <span class="stars" aria-hidden="true">@(new string('★', review.Rating))</span>
+                                <strong>@review.ReviewerName</strong>
+                                <time>@review.CreatedAt.ToLocalTime().ToString("dd MMM")</time>
+                            </div>
+                            <p class="admin-review-book">@review.BookTitle</p>
+                            @if (!string.IsNullOrWhiteSpace(review.Comment))
+                            {
+                                <p class="admin-review-comment">@review.Comment</p>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+
+        <section>
+            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Low stock</h2></div>
+
+            @if (Model.LowStockBooks.Count == 0)
+            {
+                <div class="empty-state"><p>Every title is well stocked.</p></div>
+            }
+            else
+            {
+                <div class="card">
+                    @foreach (var book in Model.LowStockBooks)
+                    {
+                        <div class="summary-row">
+                            <span><a asp-area="Admin" asp-controller="Books" asp-action="Edit" asp-route-id="@book.Id">@book.Title</a></span>
+                            <span class="badge badge-warning">@book.Stock left</span>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    </aside>
+</div>

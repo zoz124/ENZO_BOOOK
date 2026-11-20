@@ -1,0 +1,119 @@
+@model CatalogViewModel
+
+@{
+    ViewData["Title"] = "Books";
+
+    var routeValues = new Dictionary<string, string>();
+    if (!string.IsNullOrWhiteSpace(Model.Filter.Search)) routeValues["q"] = Model.Filter.Search;
+    if (Model.Filter.CategoryId.HasValue) routeValues["categoryId"] = Model.Filter.CategoryId.Value.ToString();
+    if (Model.Filter.AuthorId.HasValue) routeValues["authorId"] = Model.Filter.AuthorId.Value.ToString();
+    if (Model.Filter.MinPrice.HasValue) routeValues["minPrice"] = Model.Filter.MinPrice.Value.ToString(CultureInfo.InvariantCulture);
+    if (Model.Filter.MaxPrice.HasValue) routeValues["maxPrice"] = Model.Filter.MaxPrice.Value.ToString(CultureInfo.InvariantCulture);
+    if (Model.Filter.InStockOnly) routeValues["inStockOnly"] = "true";
+    routeValues["sort"] = Model.Filter.Sort.ToString();
+}
+
+<div class="container">
+    <div class="catalog-layout">
+        <aside class="filters">
+            <h2>Filters</h2>
+
+            <form method="get" role="search" asp-controller="Books" asp-action="Index">
+                <div class="field">
+                    <label for="q">Search</label>
+                    <input class="input" id="q" name="q" type="search" value="@Model.Filter.Search" placeholder="Title or author" />
+                </div>
+
+                <div class="field">
+                    <label for="categoryId">Category</label>
+                    <select class="input" id="categoryId" name="categoryId">
+                        <option value="">All categories</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@category.DisplayName(false)</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="authorId">Author</label>
+                    <select class="input" id="authorId" name="authorId">
+                        <option value="">All authors</option>
+                        @foreach (var author in Model.Authors)
+                        {
+                            <option value="@author.Id" selected="@(Model.Filter.AuthorId == author.Id)">@author.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Price range</label>
+                    <div class="filter-row">
+                        <input class="input" name="minPrice" type="number" min="0" step="10" placeholder="Min" value="@Model.Filter.MinPrice" />
+                        <input class="input" name="maxPrice" type="number" min="0" step="10" placeholder="Max" value="@Model.Filter.MaxPrice" />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>
+                        <input type="checkbox" name="inStockOnly" value="true" checked="@Model.Filter.InStockOnly" />
+                        In stock only
+                    </label>
+                </div>
+
+                <input type="hidden" name="sort" value="@Model.Filter.Sort" />
+
+                <button class="btn btn-primary" type="submit" style="inline-size:100%">Apply</button>
+                <a class="btn btn-ghost" asp-controller="Books" asp-action="Index" style="inline-size:100%; margin-block-start: var(--space-2)">Clear filters</a>
+            </form>
+        </aside>
+
+        <div>
+            <div class="catalog-toolbar">
+                <span>@Model.Books.TotalCount @(Model.Books.TotalCount == 1 ? "book" : "books")</span>
+
+                <form method="get" asp-controller="Books" asp-action="Index" class="inline-form">
+                    @foreach (var pair in routeValues.Where(p => p.Key is not "sort" and not "page"))
+                    {
+                        <input type="hidden" name="@pair.Key" value="@pair.Value" />
+                    }
+
+                    <label for="sort" class="visually-hidden">Sort</label>
+                    <select class="input" id="sort" name="sort" onchange="this.form.submit()" style="min-block-size: 40px">
+                        <option value="Newest" selected="@(Model.Filter.Sort == CatalogSort.Newest)">Newest</option>
+                        <option value="BestSelling" selected="@(Model.Filter.Sort == CatalogSort.BestSelling)">Best selling</option>
+                        <option value="PriceAsc" selected="@(Model.Filter.Sort == CatalogSort.PriceAsc)">Price: low to high</option>
+                        <option value="PriceDesc" selected="@(Model.Filter.Sort == CatalogSort.PriceDesc)">Price: high to low</option>
+                    </select>
+                </form>
+            </div>
+
+            @if (Model.Books.Items.Count == 0)
+            {
+                <div class="empty-state">
+                    <h2>No results</h2>
+                    <p>Try a different word, or clear the filters.</p>
+                    <a class="btn btn-primary" asp-controller="Books" asp-action="Index">Clear filters</a>
+                </div>
+            }
+            else
+            {
+                <div class="book-grid">
+                    @foreach (var book in Model.Books.Items)
+                    {
+                        <partial name="_BookCard" model="book" />
+                    }
+                </div>
+
+                <partial name="_Pagination" model="@(new PaginationInfo
+                         {
+                             Page = Model.Books.Page,
+                             TotalPages = Model.Books.TotalPages,
+                             Action = "Index",
+                             Controller = "Books",
+                             RouteValues = routeValues
+                         })" />
+            }
+        </div>
+    </div>
+</div>

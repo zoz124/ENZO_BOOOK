@@ -1,0 +1,77 @@
+@{
+    var currentController = (ViewContext.RouteData.Values["controller"] as string) ?? string.Empty;
+    var displayName = User.Identity?.Name ?? "Admin";
+    var initial = displayName.Length > 0 ? displayName[..1].ToUpperInvariant() : "A";
+}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Enzo Book Admin</title>
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+</head>
+<body class="admin-body">
+    <div class="admin-shell">
+        <aside class="admin-sidebar">
+            <a class="admin-sidebar-brand" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Enzo Book</a>
+            <p class="admin-sidebar-tagline">Bookseller console</p>
+
+            <nav aria-label="Admin sections">
+                <p class="admin-nav-label">Overview</p>
+                <ul class="admin-nav">
+                    <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
+                           aria-current="@(currentController == "Dashboard" ? "page" : null)">Dashboard</a></li>
+                </ul>
+
+                <p class="admin-nav-label">Catalogue</p>
+                <ul class="admin-nav">
+                    <li><a asp-area="Admin" asp-controller="Books" asp-action="Index"
+                           aria-current="@(currentController == "Books" ? "page" : null)">Books</a></li>
+                    <li><a asp-area="Admin" asp-controller="Categories" asp-action="Index"
+                           aria-current="@(currentController == "Categories" ? "page" : null)">Categories</a></li>
+                    <li><a asp-area="Admin" asp-controller="Authors" asp-action="Index"
+                           aria-current="@(currentController == "Authors" ? "page" : null)">Authors</a></li>
+                </ul>
+
+                <p class="admin-nav-label">Operations</p>
+                <ul class="admin-nav">
+                    <li><a asp-area="Admin" asp-controller="Orders" asp-action="Index"
+                           aria-current="@(currentController == "Orders" ? "page" : null)">Orders</a></li>
+                    <li><a asp-area="Admin" asp-controller="Users" asp-action="Index"
+                           aria-current="@(currentController == "Users" ? "page" : null)">Customers</a></li>
+                </ul>
+            </nav>
+
+            <div class="admin-sidebar-foot">
+                <a asp-area="" asp-controller="Home" asp-action="Index">View storefront ↗</a>
+            </div>
+        </aside>
+
+        <div class="admin-main">
+            <header class="admin-topbar">
+                <div class="admin-topbar-inner">
+                    <span class="admin-eyebrow">Enzo Book — administration</span>
+                    <h1 class="admin-topbar-title">@ViewData["Title"]</h1>
+                </div>
+
+                <div class="admin-user spacer">
+                    <span class="admin-user-avatar" aria-hidden="true">@initial</span>
+                    <span class="cart-line-meta">@displayName</span>
+                </div>
+
+                <form method="post" asp-area="" asp-controller="Account" asp-action="Logout" class="inline-form">
+                    <button class="btn btn-secondary btn-sm" type="submit">Sign out</button>
+                </form>
+            </header>
+
+            <div class="admin-content">
+                <partial name="_Toast" />
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

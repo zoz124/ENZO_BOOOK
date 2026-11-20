@@ -1,0 +1,152 @@
+@model OrderDetailsViewModel
+
+@{
+    var order = Model.Order;
+    ViewData["Title"] = $"Order {order.OrderNumber}";
+}
+
+<div class="container">
+    <div style="padding-block: var(--space-12) var(--space-8)">
+        <span class="eyebrow">Order @order.OrderNumber</span>
+        <h1 style="font-size: clamp(1.9rem, 3.4vw, 2.6rem)">@order.OrderNumber</h1>
+    </div>
+
+    <partial name="_Toast" />
+
+    <div class="cart-layout" style="padding-block-start: 0">
+        <div>
+            <section class="card" style="margin-block-end: var(--space-4)">
+                <div class="summary-row">
+                    <span>Status</span>
+                    <span><partial name="_StatusBadge" model="order.Status" /></span>
+                </div>
+                <div class="summary-row">
+                    <span>Placed</span>
+                    <span>@order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
+                </div>
+                <div class="summary-row">
+                    <span>Payment</span>
+                    <span>@order.PaymentLabel</span>
+                </div>
+
+                @if (Model.IsAdmin && !string.IsNullOrWhiteSpace(order.CustomerEmail))
+                {
+                    <div class="summary-row">
+                        <span>Customer</span>
+                        <span>@order.CustomerName — @order.CustomerEmail</span>
+                    </div>
+                }
+            </section>
+
+            <section class="card">
+                <h2 style="font-size: var(--font-size-h3)">Shipping details</h2>
+                <p>
+                    @order.ShippingName<br />
+                    @order.ShippingPhone<br />
+                    @order.ShippingCity — @order.ShippingAddress
+                    @if (!string.IsNullOrWhiteSpace(order.ShippingPostalCode))
+                    {
+                        <text>(@order.ShippingPostalCode)</text>
+                    }
+                </p>
+            </section>
+
+            <section class="card" style="margin-block-start: var(--space-4)">
+                <h2 style="font-size: var(--font-size-h3)">Items</h2>
+
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Book</th>
+                                <th>ISBN</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var line in order.Lines)
+                            {
+                                <tr>
+                                    <td>@line.BookTitle</td>
+                                    <td>@line.BookIsbn</td>
+                                    <td>@line.UnitPrice.ToString("N2")</td>
+                                    <td>@line.Quantity</td>
+                                    <td>@line.Subtotal.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="card" style="margin-block-start: var(--space-4)">
+                <h2 style="font-size: var(--font-size-h3)">Timeline</h2>
+
+                <ul class="timeline">
+                    @foreach (var change in order.History)
+                    {
+                        <li>
+                            <partial name="_StatusBadge" model="change.To" />
+                            <span class="cart-line-meta">
+                                @change.ChangedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                                @if (!string.IsNullOrWhiteSpace(change.Notes))
+                                {
+                                    <text> — @change.Notes</text>
+                                }
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </section>
+        </div>
+
+        <aside class="summary-card">
+            <h2>Summary</h2>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>EGP @order.Subtotal.ToString("N2")</span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span>@(order.ShippingCost == 0 ? "Free" : $"EGP {order.ShippingCost:N2}")</span>
+            </div>
+            <div class="summary-row summary-total">
+                <span>Total</span>
+                <span>EGP @order.Total.ToString("N2")</span>
+            </div>
+
+            @if (!Model.IsAdmin && order.CanCancel)
+            {
+                <form method="post" asp-controller="Orders" asp-action="Cancel" style="margin-block-start: var(--space-6)"
+                      onsubmit="return confirm('Cancel this order?');">
+                    <input type="hidden" name="id" value="@order.Id" />
+                    <input class="input" name="reason" placeholder="Reason (optional)" maxlength="500" />
+                    <button class="btn btn-danger" style="inline-size: 100%; margin-block-start: var(--space-2)" type="submit">
+                        Cancel order
+                    </button>
+                </form>
+            }
+
+            @if (Model.IsAdmin && Model.AllowedNext.Count > 0)
+            {
+                <form method="post" asp-controller="Orders" asp-action="ChangeStatus" asp-area="Admin" style="margin-block-start: var(--space-6)">
+                    <input type="hidden" name="id" value="@order.Id" />
+                    <label for="newStatus">Change status</label>
+                    <select class="input" id="newStatus" name="newStatus">
+                        @foreach (var next in Model.AllowedNext)
+                        {
+                            <option value="@next">@next</option>
+                        }
+                    </select>
+                    <input class="input" name="note" placeholder="Note (optional)" maxlength="500" style="margin-block-start: var(--space-2)" />
+                    <button class="btn btn-primary" style="inline-size: 100%; margin-block-start: var(--space-2)" type="submit">
+                        Update status
+                    </button>
+                </form>
+            }
+        </aside>
+    </div>
+</div>

@@ -1,0 +1,143 @@
+@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "Your account";
+}
+
+<div class="container">
+    <div style="padding-block: var(--space-12) var(--space-8)">
+        <span class="eyebrow">Your details</span>
+        <h1 style="font-size: clamp(1.9rem, 3.4vw, 2.6rem)">Account</h1>
+    </div>
+
+    <div class="cart-layout" style="padding-block-start: 0">
+        <div>
+            <section class="card" style="margin-block-end: var(--space-4)">
+                <h2 style="font-size: var(--font-size-h3)">Personal details</h2>
+
+                <form method="post" asp-controller="Profile" asp-action="Update">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label asp-for="FullName">Full name</label>
+                            <input class="input" asp-for="FullName" />
+                            <span asp-validation-for="FullName" class="field-error"></span>
+                        </div>
+
+                        <div class="field">
+                            <label asp-for="Phone">Phone</label>
+                            <input class="input" asp-for="Phone" placeholder="01xxxxxxxxx" />
+                            <span asp-validation-for="Phone" class="field-error"></span>
+                        </div>
+
+                        <div class="field full">
+                            <label>Email</label>
+                            <input class="input" value="@Model.Email" disabled />
+                            <span class="field-hint">Changing your email needs verification — coming in a later phase.</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" type="submit">Save changes</button>
+                </form>
+            </section>
+
+            <section class="card">
+                <h2 style="font-size: var(--font-size-h3)">Addresses</h2>
+
+                @if (Model.Addresses.Count == 0)
+                {
+                    <p class="cart-line-meta">No saved addresses yet.</p>
+                }
+                else
+                {
+                    @foreach (var address in Model.Addresses)
+                    {
+                        <div class="summary-row">
+                            <span>
+                                <strong>@address.FullName</strong> — @address.City, @address.AddressLine
+                                @if (address.IsDefault)
+                                {
+                                    <span class="badge badge-info">Default</span>
+                                }
+                            </span>
+                            <span class="inline-form">
+                                @if (!address.IsDefault)
+                                {
+                                    <form method="post" asp-controller="Profile" asp-action="SetDefaultAddress" class="inline-form">
+                                        <input type="hidden" name="id" value="@address.Id" />
+                                        <button class="link-button" type="submit">Make default</button>
+                                    </form>
+                                }
+                                <form method="post" asp-controller="Profile" asp-action="DeleteAddress" class="inline-form"
+                                      onsubmit="return confirm('Delete this address?');">
+                                    <input type="hidden" name="id" value="@address.Id" />
+                                    <button class="link-button" type="submit">Delete</button>
+                                </form>
+                            </span>
+                        </div>
+                    }
+                }
+
+                <h3 style="margin-block-start: var(--space-8); font-size: var(--font-size-lg); font-family: var(--font-ui); font-weight: 500">Add an address</h3>
+
+                <form method="post" asp-controller="Profile" asp-action="AddAddress">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="FullName">Full name</label>
+                            <input class="input" id="FullName" name="FullName" required maxlength="100" />
+                        </div>
+                        <div class="field">
+                            <label for="Phone">Phone</label>
+                            <input class="input" id="Phone" name="Phone" required placeholder="01xxxxxxxxx" />
+                        </div>
+                        <div class="field">
+                            <label for="City">City / governorate</label>
+                            <input class="input" id="City" name="City" required maxlength="100" />
+                        </div>
+                        <div class="field">
+                            <label for="PostalCode">Postal code</label>
+                            <input class="input" id="PostalCode" name="PostalCode" maxlength="20" />
+                        </div>
+                        <div class="field full">
+                            <label for="AddressLine">Street address</label>
+                            <input class="input" id="AddressLine" name="AddressLine" required maxlength="500" />
+                        </div>
+                        <div class="field full">
+                            <label>
+                                <input type="checkbox" id="IsDefault" name="IsDefault" value="true" />
+                                Make this my default address
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary" type="submit">Add address</button>
+                </form>
+            </section>
+        </div>
+
+        <aside class="summary-card">
+            <h2>Password</h2>
+
+            <form method="post" asp-controller="Profile" asp-action="ChangePassword">
+                <div class="field">
+                    <label for="CurrentPassword">Current password</label>
+                    <input class="input" id="CurrentPassword" name="CurrentPassword" type="password" required />
+                </div>
+                <div class="field">
+                    <label for="NewPassword">New password</label>
+                    <input class="input" id="NewPassword" name="NewPassword" type="password" required minlength="8" />
+                </div>
+                <div class="field">
+                    <label for="ConfirmPassword">Confirm password</label>
+                    <input class="input" id="ConfirmPassword" name="ConfirmPassword" type="password" required />
+                </div>
+
+                <button class="btn btn-primary" style="inline-size: 100%" type="submit">Change password</button>
+            </form>
+
+            <p class="cart-line-meta" style="margin-block-start: var(--space-4)">
+                <a asp-controller="Orders" asp-action="Index">Your orders</a> ·
+                <a asp-controller="Wishlist" asp-action="Index">Wishlist</a>
+            </p>
+        </aside>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] ??= "Welcome";
+}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Enzo Book</title>
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+</head>
+<body class="auth-body">
+    <div class="auth-photo" aria-hidden="true"></div>
+
+    <main class="auth-shell">
+        <a class="auth-close" asp-controller="Home" asp-action="Index" aria-label="Close and return to the store">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                 stroke-linecap="round" aria-hidden="true">
+                <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+        </a>
+
+        <div class="auth-panel">
+            @RenderBody()
+        </div>
+    </main>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

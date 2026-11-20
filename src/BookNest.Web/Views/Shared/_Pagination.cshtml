@@ -1,0 +1,18 @@
+@model PaginationInfo
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="pagination" aria-label="Pagination">
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            var routeValues = new Dictionary<string, string>(Model.RouteValues) { ["page"] = i.ToString() };
+
+            <a class="page-link @(i == Model.Page ? "is-active" : string.Empty)"
+               asp-action="@Model.Action"
+               asp-controller="@Model.Controller"
+               asp-area="@Model.Area"
+               asp-all-route-data="routeValues"
+               aria-current="@(i == Model.Page ? "page" : null)">@i</a>
+        }
+    </nav>
+}

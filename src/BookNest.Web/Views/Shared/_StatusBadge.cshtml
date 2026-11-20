@@ -1,0 +1,15 @@
+@model BookNest.Core.Enums.OrderStatus
+
+@{
+    var (cssClass, label) = Model switch
+    {
+        OrderStatus.Pending => ("badge-warning", "Pending"),
+        OrderStatus.Processing => ("badge-info", "Processing"),
+        OrderStatus.Shipped => ("badge-info", "Shipped"),
+        OrderStatus.Delivered => ("badge-success", "Delivered"),
+        OrderStatus.Cancelled => ("badge-danger", "Cancelled"),
+        _ => ("badge-info", Model.ToString())
+    };
+}
+
+<span class="badge @cssClass">@label</span>

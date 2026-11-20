@@ -1,0 +1,11 @@
+@model string
+
+<div class="auth-tabs" role="tablist" aria-label="Account">
+    <a class="auth-tab @(Model == "login" ? "is-active" : null)" role="tab"
+       aria-selected="@(Model == "login" ? "true" : "false")"
+       asp-controller="Account" asp-action="Login">Sign in</a>
+
+    <a class="auth-tab @(Model == "register" ? "is-active" : null)" role="tab"
+       aria-selected="@(Model == "register" ? "true" : "false")"
+       asp-controller="Account" asp-action="Register">Register</a>
+</div>

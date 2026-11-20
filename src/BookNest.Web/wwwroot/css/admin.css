@@ -1,0 +1,391 @@
+/* ==========================================================================
+   Enzo Book — admin console layer
+   Brings the storefront's editorial language (deep forest green, cream paper,
+   Caslon headings) into the bookseller console, with a wider content canvas.
+   Loaded after commerce.css so it owns the admin sections.
+   ========================================================================== */
+
+.admin-body {
+  background-color: var(--cream);
+}
+
+.admin-shell {
+  grid-template-columns: var(--admin-sidebar-width) 1fr;
+}
+
+/* ---------- Rail ---------- */
+.admin-sidebar {
+  padding: 42px 20px 24px;
+  background-color: var(--green-950);
+  background-image:
+    radial-gradient(circle at 12% -10%, rgba(146, 184, 169, 0.22) 0%, transparent 58%),
+    linear-gradient(180deg, var(--green-950), #0B2A22);
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.admin-sidebar-brand {
+  font-size: 26px;
+  letter-spacing: 0.2em;
+  line-height: 0.95;
+  padding-inline: 6px;
+  margin-block-end: 8px;
+}
+
+.admin-sidebar-tagline {
+  padding-inline: 6px;
+  margin-block-end: 38px;
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.44);
+}
+
+.admin-nav {
+  gap: 1px;
+}
+
+.admin-nav a {
+  padding: 12px 14px;
+  min-block-size: 42px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.66);
+  border-inline-start: 2px solid transparent;
+}
+
+.admin-nav a:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-inline-start-color: rgba(255, 255, 255, 0.32);
+  color: #FFFFFF;
+}
+
+.admin-nav a[aria-current="page"] {
+  background-color: var(--cream);
+  border-inline-start-color: var(--sage);
+  color: var(--green-950);
+  font-weight: 600;
+}
+
+.admin-nav-label {
+  margin-block: 28px 10px;
+  padding-inline: 6px;
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.36);
+}
+
+.admin-sidebar-foot {
+  padding-block-start: 20px;
+}
+
+.admin-sidebar-foot a {
+  padding: 10px 6px;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+}
+
+/* ---------- Top bar ---------- */
+.admin-topbar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 30;
+  min-block-size: 86px;
+  padding-inline: var(--space-8);
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  border-block-end: 1px solid var(--line);
+}
+
+.admin-topbar-title {
+  font-size: 25px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.admin-eyebrow {
+  font-size: 8px;
+  letter-spacing: 0.26em;
+  color: var(--green-700);
+}
+
+.admin-user {
+  padding-inline: var(--space-3);
+  border-inline-start: 1px solid var(--line-soft);
+}
+
+.admin-user-avatar {
+  background-color: var(--green-950);
+  border: 0;
+  color: var(--cream);
+}
+
+/* ---------- Canvas ---------- */
+.admin-content {
+  padding: 46px var(--space-8) 120px;
+}
+
+.admin-content > * {
+  max-inline-size: var(--admin-content-max);
+}
+
+.admin-page-head {
+  padding-block-end: var(--space-6);
+  margin-block-end: var(--space-8);
+  border-block-end: 1px solid var(--line);
+}
+
+.admin-page-head h2 {
+  font-size: clamp(34px, 3.4vw, 54px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.admin-page-head p {
+  max-inline-size: 62ch;
+}
+
+.admin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--white);
+  border: 1px solid var(--line);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+/* ---------- Stat cards ---------- */
+.stat-grid--five {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.stat-card {
+  min-block-size: 176px;
+  padding: 26px 24px 22px;
+  background-color: var(--white);
+  border: 1px solid var(--line-soft);
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-card::after {
+  block-size: 3px;
+  background-color: var(--green-700);
+}
+
+.stat-card--primary {
+  background-color: var(--green-950);
+  border-color: var(--green-950);
+}
+
+.stat-card--primary::after {
+  background-color: var(--sage);
+  opacity: 1;
+}
+
+.stat-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+}
+
+.stat-value {
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  margin-block-start: 18px;
+}
+
+.stat-foot {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+
+/* ---------- Panels ---------- */
+.admin-section {
+  padding-block: var(--space-8);
+  border-block-start: 1px solid var(--line-soft);
+}
+
+.admin-section:first-of-type {
+  border-block-start: 0;
+  padding-block-start: 0;
+}
+
+.admin-section .section-head {
+  margin-block-end: var(--space-6);
+}
+
+.admin-section .section-head h2 {
+  font-size: 30px;
+  letter-spacing: -0.02em;
+}
+
+.chart-bars {
+  block-size: 230px;
+  padding: var(--space-5, 20px) var(--space-5, 20px) 0;
+  gap: 4px;
+  background-color: var(--white);
+  background-image: repeating-linear-gradient(
+    to top,
+    transparent 0,
+    transparent calc(25% - 1px),
+    var(--line-soft) calc(25% - 1px),
+    var(--line-soft) 25%
+  );
+  border: 1px solid var(--line-soft);
+}
+
+.chart-bar {
+  max-inline-size: 64px;
+  background-color: var(--green-700);
+  transition: background-color var(--dur-fast) var(--ease);
+}
+
+.chart-bar:hover {
+  background-color: var(--green-950);
+}
+
+.chart-bar.is-empty {
+  background-color: var(--line);
+}
+
+.chart-bar.is-empty:hover {
+  background-color: var(--green-100);
+}
+
+.chart-foot {
+  padding-block-start: 10px;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+}
+
+/* ---------- Quick actions ---------- */
+.admin-actions {
+  display: grid;
+  gap: 1px;
+  background-color: var(--line-soft);
+  border: 1px solid var(--line-soft);
+}
+
+.admin-actions a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 15px 18px;
+  background-color: var(--white);
+  color: var(--ink);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-actions a span:last-child {
+  color: var(--green-700);
+}
+
+.admin-actions a:hover {
+  background-color: var(--cream);
+  color: var(--green-950);
+  text-decoration: none;
+}
+
+/* ---------- Tables ---------- */
+.table th,
+.table td {
+  block-size: 54px;
+  padding-inline: 18px;
+}
+
+.table thead th {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.table tbody tr:last-child td {
+  border-block-end: 0;
+}
+
+.admin-book-cell {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-inline-size: 220px;
+}
+
+.admin-book-cell img,
+.admin-book-cell .thumb {
+  inline-size: 38px;
+  block-size: 56px;
+  object-fit: cover;
+  display: block;
+  background-color: var(--paper);
+}
+
+.admin-book-cell strong {
+  font-family: var(--font-book);
+  font-size: 15px;
+  font-weight: 400;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.admin-book-cell small {
+  display: block;
+  margin-block-start: 3px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.admin-bar {
+  display: block;
+  block-size: 3px;
+  margin-block-start: 8px;
+  background-color: var(--green-700);
+}
+
+/* ---------- Side rail cards ---------- */
+.admin-split {
+  grid-template-columns: minmax(0, 1fr) 390px;
+  gap: var(--space-8);
+}
+
+.admin-split .card {
+  border-color: var(--line-soft);
+}
+
+.admin-split .summary-row:last-of-type {
+  border-block-end: 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1400px) {
+  .stat-grid--five { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 1100px) {
+  .admin-split { grid-template-columns: 1fr; }
+  .stat-grid--five { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-topbar { padding-inline: var(--space-4); }
+  .admin-content { padding: 32px var(--space-4) 96px; }
+}
+
+@media (max-width: 768px) {
+  .admin-content > * { max-inline-size: none; }
+  .stat-value { font-size: 36px; }
+  .stat-grid--five { grid-template-columns: 1fr; }
+  .stat-card { min-block-size: 0; }
+  .admin-page-head h2 { font-size: 32px; }
+  .chart-bars { block-size: 150px; }
+}

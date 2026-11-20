@@ -1,0 +1,348 @@
+@model BookDetailsViewModel
+
+@{
+    var book = Model.Book;
+    var reviews = Model.Reviews;
+    var returnUrl = Context.Request.Path;
+    ViewData["Title"] = book.Title;
+
+    var palettes = new[]
+    {
+        ("#F3E8CC", "#183E35"),
+        ("#F6E4DE", "#8A4A3C"),
+        ("#DEE7EA", "#2C4D57"),
+        ("#E7E9DA", "#3C4A33"),
+        ("#EFE3D2", "#6B4B2A"),
+        ("#E3E4EF", "#3C3F63")
+    };
+
+    var (coverBg, coverInk) = palettes[Math.Abs(book.Id) % palettes.Length];
+    var discountPercent = book.DiscountPrice.HasValue && book.Price > 0
+        ? (int)Math.Round((book.Price - book.EffectivePrice) / book.Price * 100)
+        : 0;
+}
+
+<div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <span>/</span>
+        <a asp-controller="Books" asp-action="Index">Books</a>
+        <span>/</span>
+        <span>@book.Title</span>
+    </nav>
+
+    <div class="product">
+        <div class="product-visual">
+            <div class="product-frame">
+                @if (!string.IsNullOrWhiteSpace(book.CoverImageUrl))
+                {
+                    <img src="@book.CoverImageUrl" alt="Cover of @book.Title" />
+                }
+                else
+                {
+                    <div class="product-frame-cover" style="background:@coverBg; color:@coverInk">
+                        <span class="cover-mark">E</span>
+                        <div class="cover-copy">
+                            <span>@book.CategoryName</span>
+                            <strong>@book.Title</strong>
+                            <em>@book.AuthorName</em>
+                        </div>
+                        <div class="cover-lines"></div>
+                    </div>
+                }
+            </div>
+            <p class="product-frame-note">Enzo edition · Paperback</p>
+        </div>
+
+        <div class="product-info">
+            <span class="eyebrow">@book.CategoryName</span>
+            <h1>@book.Title</h1>
+            <p class="product-author">
+                by
+                <a asp-controller="Books" asp-action="Index" asp-route-authorId="@book.AuthorId">@book.AuthorName</a>
+            </p>
+
+            <div class="product-rating">
+                <span class="stars" aria-hidden="true">@Stars(reviews.AverageRating)</span>
+
+                @if (reviews.HasReviews)
+                {
+                    <strong>@reviews.AverageRating.ToString("0.0")</strong>
+                    <a href="#reviews" class="product-rating-count">@reviews.ReviewCount @(reviews.ReviewCount == 1 ? "review" : "reviews")</a>
+                }
+                else
+                {
+                    <span class="product-rating-empty">No ratings yet</span>
+                }
+            </div>
+
+            <div class="product-price">
+                <strong>EGP @book.EffectivePrice.ToString("N2")</strong>
+
+                @if (book.DiscountPrice.HasValue)
+                {
+                    <del>EGP @book.Price.ToString("N2")</del>
+                    <span class="product-save">Save @discountPercent%</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(book.Description))
+            {
+                <p class="product-lead">@book.Description</p>
+            }
+
+            <div class="stock-line" data-stock-watch
+                 data-stock-url="@Url.Action("Stock", "Books", new { id = book.Id })">
+                <span class="stock-badge @(book.Stock <= 0 ? "is-out" : book.Stock <= 10 ? "is-low" : "is-in")"
+                      id="stock-badge" data-stock="@book.Stock">
+                    @(book.Stock <= 0 ? "Out of stock" : $"{book.Stock} copies in stock")
+                </span>
+                <span class="stock-hint">Live stock</span>
+            </div>
+
+            <div class="buy-row">
+                <form method="post" asp-controller="Cart" asp-action="Add" class="buy-form" id="buy-form">
+                    <input type="hidden" name="bookId" value="@book.Id" />
+                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                    <div class="qty-stepper">
+                        <button class="qty-step" type="button" data-step="-1" aria-label="Decrease quantity">−</button>
+                        <input class="qty-value" id="quantity" name="quantity" type="number" inputmode="numeric"
+                               min="1" max="@Math.Max(book.Stock, 1)" value="1" aria-label="Quantity" />
+                        <button class="qty-step" type="button" data-step="1" aria-label="Increase quantity">+</button>
+                    </div>
+
+                    <button class="btn btn-primary buy-button" id="buy-button" type="submit"
+                            disabled="@(book.Stock <= 0)">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 8h14l-1 13H6L5 8Z" />
+                            <path d="M9 10V6a3 3 0 0 1 6 0v4" />
+                        </svg>
+                        <span id="buy-button-label">@(book.Stock <= 0 ? "Out of stock" : $"Add to bag — EGP {book.EffectivePrice:N0}")</span>
+                    </button>
+                </form>
+
+                @if (Model.IsSignedIn)
+                {
+                    <form method="post" asp-controller="Wishlist"
+                          asp-action="@(Model.InWishlist ? "Remove" : "Add")" class="wish-toggle-form">
+                        <input type="hidden" name="bookId" value="@book.Id" />
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        <button class="wish-toggle @(Model.InWishlist ? "is-on" : null)" type="submit"
+                                aria-pressed="@(Model.InWishlist ? "true" : "false")"
+                                aria-label="@(Model.InWishlist ? "Remove from wishlist" : "Save to wishlist")"
+                                title="@(Model.InWishlist ? "Remove from wishlist" : "Save to wishlist")">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="@(Model.InWishlist ? "currentColor" : "none")"
+                                 stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.4 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+                            </svg>
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a class="wish-toggle" asp-controller="Account" asp-action="Login"
+                       asp-route-returnUrl="@returnUrl" aria-label="Sign in to save to your wishlist"
+                       title="Sign in to save to your wishlist">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.4 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+                        </svg>
+                    </a>
+                }
+            </div>
+
+            <div class="product-perks">
+                <span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 6h11v11H3zM14 10h4l3 3v4h-7z" /><circle cx="7" cy="19" r="2" /><circle cx="18" cy="19" r="2" />
+                    </svg>
+                    Free delivery over EGP 500
+                </span>
+                <span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 3 4 6v5c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-3Z" />
+                    </svg>
+                    Secure checkout
+                </span>
+                <span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" />
+                    </svg>
+                    30-day returns
+                </span>
+            </div>
+
+            <div class="product-accordion">
+                <details open>
+                    <summary>About this book <span aria-hidden="true">−</span></summary>
+                    <p>
+                        @(string.IsNullOrWhiteSpace(book.Description)
+                            ? "A carefully selected Enzo edition for readers who value ideas, craft and beautiful objects."
+                            : book.Description)
+                    </p>
+                </details>
+
+                <details>
+                    <summary>Product details <span aria-hidden="true">+</span></summary>
+                    <dl class="product-facts">
+                        <div><dt>ISBN</dt><dd>@book.Isbn</dd></div>
+                        @if (!string.IsNullOrWhiteSpace(book.Publisher))
+                        {
+                            <div><dt>Publisher</dt><dd>@book.Publisher</dd></div>
+                        }
+                        @if (book.Pages.HasValue)
+                        {
+                            <div><dt>Pages</dt><dd>@book.Pages</dd></div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(book.Language))
+                        {
+                            <div><dt>Language</dt><dd>@book.Language</dd></div>
+                        }
+                        @if (book.PublishedDate.HasValue)
+                        {
+                            <div><dt>Published</dt><dd>@book.PublishedDate.Value.Year</dd></div>
+                        }
+                        <div><dt>Format</dt><dd>Paperback</dd></div>
+                    </dl>
+                </details>
+
+                <details>
+                    <summary>Delivery &amp; returns <span aria-hidden="true">+</span></summary>
+                    <p>
+                        Orders are packed within one working day. Delivery is free over EGP 500 and costs
+                        EGP 50 otherwise. Unread books can be returned within 30 days.
+                    </p>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <section class="reviews" id="reviews">
+        <div class="reviews-head">
+            <div>
+                <span class="eyebrow">Reader reviews</span>
+                <h2>What readers say</h2>
+            </div>
+
+            <div class="reviews-score">
+                <strong>@reviews.AverageRating.ToString("0.0")</strong>
+                <span class="stars" aria-hidden="true">@Stars(reviews.AverageRating)</span>
+                <small>@reviews.ReviewCount @(reviews.ReviewCount == 1 ? "rating" : "ratings")</small>
+            </div>
+        </div>
+
+        @if (reviews.MyReview is { } mine)
+        {
+            <div class="review-mine">
+                <span class="eyebrow">Your review</span>
+                <div class="review-item">
+                    <div class="review-top">
+                        <span class="stars" aria-hidden="true">@Stars(mine.Rating)</span>
+                        <time datetime="@mine.CreatedAt.ToString("yyyy-MM-dd")">@mine.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</time>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(mine.Comment))
+                    {
+                        <p>@mine.Comment</p>
+                    }
+
+                    <form method="post" asp-controller="Books" asp-action="DeleteReview" asp-route-id="@book.Id" class="inline-form">
+                        <button class="link-button" type="submit">Delete my review</button>
+                    </form>
+                </div>
+                <p class="review-hint">One rating per account — delete this review to rate the book again.</p>
+            </div>
+        }
+        else if (Model.IsSignedIn)
+        {
+            <form method="post" asp-controller="Books" asp-action="AddReview" asp-route-id="@book.Id" class="review-form">
+                <h3>Rate this book</h3>
+
+                <div class="star-input">
+                    @for (var star = 5; star >= 1; star--)
+                    {
+                        <input type="radio" id="star-@star" name="rating" value="@star" checked="@(star == 5)" />
+                        <label for="star-@star" aria-label="@star @(star == 1 ? "star" : "stars")">★</label>
+                    }
+                </div>
+
+                <label class="visually-hidden" for="comment">Your comment</label>
+                <textarea class="input" id="comment" name="comment" rows="3" maxlength="1000"
+                          placeholder="What did you think? (optional)"></textarea>
+
+                <button class="btn btn-primary" type="submit">Post review</button>
+            </form>
+        }
+        else
+        {
+            <div class="review-cta">
+                <p>Sign in to rate this book and share a comment with other readers.</p>
+                <a class="btn btn-secondary" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">
+                    Sign in to review
+                </a>
+            </div>
+        }
+
+        @if (reviews.Reviews.Count > 0)
+        {
+            <ul class="review-list">
+                @foreach (var review in reviews.Reviews)
+                {
+                    <li class="review-item">
+                        <div class="review-top">
+                            <strong>@review.ReviewerName</strong>
+                            <span class="stars" aria-hidden="true">@Stars(review.Rating)</span>
+                            <time datetime="@review.CreatedAt.ToString("yyyy-MM-dd")">@review.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</time>
+                            @if (review.IsMine)
+                            {
+                                <span class="badge badge-success">Your review</span>
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(review.Comment))
+                        {
+                            <p>@review.Comment</p>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="review-empty">No reviews yet — be the first to rate this book.</p>
+        }
+    </section>
+
+    @if (Model.Similar.Count > 0)
+    {
+        <section class="section" style="padding-block-end: 0">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Keep exploring</span>
+                    <h2>You may also like</h2>
+                </div>
+            </div>
+
+            <div class="book-grid">
+                @foreach (var similar in Model.Similar)
+                {
+                    <partial name="_BookCard" model="similar" />
+                }
+            </div>
+        </section>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/app.js" asp-append-version="true"></script>
+}
+
+@functions {
+    private static string Stars(double value)
+    {
+        var filled = Math.Clamp((int)Math.Round(value), 0, 5);
+        return new string('★', filled) + new string('☆', 5 - filled);
+    }
+}

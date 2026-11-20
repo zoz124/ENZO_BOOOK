@@ -1,0 +1,51 @@
+@model IReadOnlyList<OrderSummaryDto>
+
+@{
+    ViewData["Title"] = "Your orders";
+}
+
+<div class="container">
+    <div style="padding-block: var(--space-12) var(--space-8)">
+        <span class="eyebrow">Your shelf history</span>
+        <h1 style="font-size: clamp(1.9rem, 3.4vw, 2.6rem)">Orders</h1>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state" style="margin-block-end: var(--space-24)">
+            <h2>No orders yet</h2>
+            <p>Your first order will appear here with its status and details.</p>
+            <a class="btn btn-primary" asp-controller="Books" asp-action="Index">Browse books</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-wrapper" style="margin-block-end: var(--space-24)">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Date</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td>@order.OrderNumber</td>
+                            <td>@order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
+                            <td>@order.ItemCount</td>
+                            <td>EGP @order.Total.ToString("N2")</td>
+                            <td><partial name="_StatusBadge" model="order.Status" /></td>
+                            <td><a asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id">View</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,121 @@
+/* ==========================================================================
+   Enzo Book — Design Tokens (matched to the Figma "Enzo Store Bookshop" make file)
+   Squared editorial bookstore: white + cream + deep forest green.
+   ========================================================================== */
+
+:root {
+  /* Brand green */
+  --green: #123C32;
+  --green-deep: #0D3028;
+  --green-950: #0D3028;
+  --green-900: #123C32;
+  --green-800: #17493C;
+  --green-700: #3F6D5E;
+  --green-600: #4F7C6D;
+  --green-100: #DCE7DF;
+  --green-50: #EFF3EF;
+
+  /* Cream / paper */
+  --cream: #F7F5EF;
+  --cream-soft: #F4F3ED;
+  --cream-deep: #EFECE2;
+  --paper: #F1F3EF;
+  --sage: #D8E4D9;
+  --sage-ink: #92B8A9;
+  --white: #FFFFFF;
+
+  /* Ink */
+  --ink: #17231F;
+  --muted: #6B7A73;
+  --ink-muted: #7B8581;
+  --line: #E0E3DE;
+  --line-soft: #ECEEE9;
+
+  /* Feedback */
+  --success: #2E6F55;
+  --warning: #8A6A1F;
+  --danger: #A02F26;
+  --info: #2F5D7A;
+  --gold: #D19F3D;
+
+  /* Aliases used by existing components */
+  --color-primary-700: var(--green-900);
+  --color-primary-600: var(--green-800);
+  --color-primary-100: var(--green-50);
+  --color-accent-500: var(--green-900);
+  --color-accent-600: var(--green-950);
+  --color-bg: var(--cream);
+  --color-bg-admin: var(--cream);
+  --color-surface: var(--white);
+  --color-text: var(--ink);
+  --color-text-muted: var(--ink-muted);
+  --color-border: var(--line);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-on-brand: var(--white);
+  --color-link: var(--green-800);
+  --color-link-strong: var(--green-900);
+
+  /* Radius — squared, editorial */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-pill: 999px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* Typography — Libre Caslon Display + DM Sans, Amiri for Arabic titles */
+  --font-ui: "DM Sans", "Noto Naskh Arabic", Arial, sans-serif;
+  --font-display: "Libre Caslon Display", "Amiri", Georgia, serif;
+  --font-book: "Libre Caslon Display", "Amiri", Georgia, serif;
+
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-md: 15px;
+  --font-size-lg: 18px;
+  --font-size-h3: 22px;
+  --font-size-h2: 45px;
+  --font-size-h1: 88px;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-en: 1.7;
+  --line-height-ar: 1.8;
+
+  --tracking-wide: 0.16em;
+  --tracking-brand: 0.11em;
+
+  /* Elevation — hairlines first, shadows only on float layers */
+  --shadow-sm: 0 1px 2px rgba(23, 35, 31, 0.04);
+  --shadow-md: 0 10px 30px rgba(23, 35, 31, 0.08);
+  --shadow-lg: 0 24px 60px rgba(23, 35, 31, 0.14);
+
+  /* Motion */
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
+  --dur-slow: 400ms;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+
+  /* Layout */
+  --container-max: 1440px;
+  --admin-content-max: 1560px;
+  --admin-sidebar-width: 268px;
+  --admin-sidebar-collapsed: 76px;
+  --row-height: 48px;
+
+  color-scheme: light;
+}

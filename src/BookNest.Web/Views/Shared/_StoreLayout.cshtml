@@ -1,0 +1,158 @@
+@inject BookNest.Core.Interfaces.IServices.ICartService CartService
+@{
+    var cartCount = (await CartService.GetAsync()).TotalItems;
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var isAdmin = User.IsInRole("Admin");
+    var currentController = (ViewContext.RouteData.Values["controller"] as string) ?? string.Empty;
+    var currentAction = (ViewContext.RouteData.Values["action"] as string) ?? string.Empty;
+}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Enzo Book</title>
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="announce">
+        Free shipping on orders over EGP 500
+        <a asp-controller="Books" asp-action="Index">Explore the collection</a>
+    </div>
+
+    <header class="site-head">
+        <nav class="site-nav container" aria-label="Main navigation">
+            <details class="menu-drawer">
+                <summary aria-label="Menu">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                        <path d="M4 7h16M4 12h16M4 17h16" />
+                    </svg>
+                </summary>
+                <div class="menu-drawer-links">
+                    <a asp-controller="Home" asp-action="Index">Home</a>
+                    <a asp-controller="Books" asp-action="Index">Books</a>
+                    <a asp-controller="Books" asp-action="Index" asp-route-categoryId="1">Fiction</a>
+                    <a asp-controller="Books" asp-action="Index" asp-route-categoryId="6">Business</a>
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="story">Our story</a>
+                </div>
+            </details>
+
+            <a class="site-logo" asp-controller="Home" asp-action="Index" aria-label="Enzo Book home">
+                <span>ENZO</span>
+                <small>BOOK STORE</small>
+            </a>
+
+            <ul class="site-nav-links">
+                <li>
+                    <a asp-controller="Home" asp-action="Index"
+                       aria-current="@(currentController == "Home" && currentAction == "Index" ? "page" : null)">Home</a>
+                </li>
+                <li>
+                    <a asp-controller="Books" asp-action="Index"
+                       aria-current="@(currentController == "Books" && currentAction == "Index" ? "page" : null)">Books</a>
+                </li>
+                <li><a asp-controller="Books" asp-action="Index" asp-route-categoryId="1">Fiction</a></li>
+                <li><a asp-controller="Books" asp-action="Index" asp-route-categoryId="6">Business</a></li>
+                <li><a asp-controller="Home" asp-action="Index" asp-fragment="story">Our Story</a></li>
+            </ul>
+
+            <div class="site-actions">
+                <a class="icon-btn" asp-controller="Books" asp-action="Index" aria-label="Search books">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="m20 20-4-4" />
+                    </svg>
+                </a>
+
+                <a class="icon-btn" asp-controller="@(isAuthenticated ? "Profile" : "Account")" asp-action="@(isAuthenticated ? "Index" : "Login")" aria-label="Account">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 21c.8-5 3.5-7 8-7s7.2 2 8 7" />
+                    </svg>
+                </a>
+
+                <a class="icon-btn" asp-controller="Cart" asp-action="Index" aria-label="Shopping bag">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                        <path d="M5 8h14l-1 13H6L5 8Z" />
+                        <path d="M9 10V6a3 3 0 0 1 6 0v4" />
+                    </svg>
+                    @if (cartCount > 0)
+                    {
+                        <span class="count">@cartCount</span>
+                    }
+                </a>
+
+                @if (isAdmin)
+                {
+                    <a class="icon-btn" asp-area="Admin" asp-controller="Dashboard" asp-action="Index" aria-label="Admin">Admin</a>
+                }
+            </div>
+        </nav>
+    </header>
+
+    <main class="store-main">
+        <partial name="_Toast" />
+        @RenderBody()
+    </main>
+
+    <footer class="store-footer">
+        <div class="container">
+            <div class="foot-grid">
+                <div class="foot-brand">
+                    <span>ENZO</span>
+                    <small>BOOK STORE</small>
+                    <p>Thoughtfully selected books for curious minds.</p>
+                </div>
+
+                <div>
+                    <p class="foot-title">Explore</p>
+                    <ul class="foot-list">
+                        <li><a asp-controller="Books" asp-action="Index">All books</a></li>
+                        <li><a asp-controller="Books" asp-action="Index" asp-route-sort="@CatalogSort.BestSelling">Bestsellers</a></li>
+                        <li><a asp-controller="Books" asp-action="Index" asp-route-sort="@CatalogSort.Newest">New arrivals</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <p class="foot-title">Enzo</p>
+                    <ul class="foot-list">
+                        <li><a asp-controller="Home" asp-action="Index" asp-fragment="story">Our story</a></li>
+                        <li><a asp-controller="Wishlist" asp-action="Index">Wishlist</a></li>
+                        <li><a asp-controller="Orders" asp-action="Index">Your orders</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <p class="foot-title">Help</p>
+                    <ul class="foot-list">
+                        <li><span>Shipping &amp; returns</span></li>
+                        <li><span>Contact us</span></li>
+                        <li><span>FAQs</span></li>
+                    </ul>
+                </div>
+
+                <div class="foot-stay">
+                    <p class="foot-title">Stay curious.</p>
+                    <p>Get the latest Enzo edit in your inbox.</p>
+                    <form class="foot-form" asp-controller="Account" asp-action="Register" method="get">
+                        <label class="visually-hidden" for="foot-email">Email address</label>
+                        <input id="foot-email" type="email" name="email" placeholder="Email address" />
+                        <button type="submit" aria-label="Subscribe">→</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="foot-bottom">
+                <span>© @DateTime.UtcNow.Year Enzo Store. All rights reserved.</span>
+                <span class="foot-social">
+                    <span>Instagram</span>
+                    <span>Pinterest</span>
+                    <span>Goodreads</span>
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
