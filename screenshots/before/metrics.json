@@ -1,0 +1,75 @@
+[
+  {
+    "width": 1440,
+    "clientWidth": 1440,
+    "scrollWidth": 1440,
+    "pageHeight": 1928,
+    "cardRows": [
+      5
+    ],
+    "cardHeights": [
+      176
+    ],
+    "chartTop": 578,
+    "chartHeight": 230,
+    "h1Count": 1
+  },
+  {
+    "width": 1024,
+    "clientWidth": 1024,
+    "scrollWidth": 1024,
+    "pageHeight": 2724,
+    "cardRows": [
+      2,
+      2,
+      1
+    ],
+    "cardHeights": [
+      176
+    ],
+    "chartTop": 933,
+    "chartHeight": 230,
+    "h1Count": 1
+  },
+  {
+    "width": 768,
+    "clientWidth": 768,
+    "scrollWidth": 768,
+    "pageHeight": 2977,
+    "cardRows": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "cardHeights": [
+      155
+    ],
+    "chartTop": 1266,
+    "chartHeight": 150,
+    "h1Count": 1
+  },
+  {
+    "width": 390,
+    "clientWidth": 390,
+    "scrollWidth": 619,
+    "pageHeight": 3593,
+    "cardRows": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "cardHeights": [
+      236,
+      170,
+      200,
+      185
+    ],
+    "chartTop": 1869,
+    "chartHeight": 150,
+    "h1Count": 1
+  }
+]

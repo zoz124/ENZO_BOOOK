@@ -13,7 +13,7 @@
 <div class="admin-page-head">
     <div>
         <p class="admin-eyebrow">Catalogue</p>
-        <h2>Books</h2>
+        <h1>Books</h1>
         <p>@Model.TotalCount titles in the store, archived ones included.</p>
     </div>
 
@@ -89,7 +89,11 @@ else
                             }
                         </td>
                         <td>
-                            @if (book.Stock <= 0)
+                            @if (book.IsDeleted)
+                            {
+                                <span class="badge badge-info">Archived</span>
+                            }
+                            else if (book.Stock <= 0)
                             {
                                 <span class="badge badge-danger">Sold out</span>
                             }
@@ -105,11 +109,21 @@ else
                         <td class="inline-form">
                             <a asp-area="Admin" asp-controller="Books" asp-action="Edit" asp-route-id="@book.Id">Edit</a>
 
-                            <form method="post" asp-area="Admin" asp-controller="Books" asp-action="Delete" class="inline-form"
-                                  onsubmit="return confirm('Archive this book? Orders keep their history.');">
-                                <input type="hidden" name="id" value="@book.Id" />
-                                <button class="link-button" type="submit">Archive</button>
-                            </form>
+                            @if (book.IsDeleted)
+                            {
+                                <form method="post" asp-area="Admin" asp-controller="Books" asp-action="Restore" class="inline-form">
+                                    <input type="hidden" name="id" value="@book.Id" />
+                                    <button class="link-button" type="submit">Restore</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" asp-area="Admin" asp-controller="Books" asp-action="Delete" class="inline-form"
+                                      onsubmit="return confirm('Archive this book? Orders keep their history.');">
+                                    <input type="hidden" name="id" value="@book.Id" />
+                                    <button class="link-button" type="submit">Archive</button>
+                                </form>
+                            }
                         </td>
                     </tr>
                 }

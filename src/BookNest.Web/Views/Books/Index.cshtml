@@ -14,40 +14,100 @@
 }
 
 <div class="container">
-    <div class="catalog-layout">
-        <aside class="filters">
-            <h2>Filters</h2>
+    <form method="get" asp-controller="Books" asp-action="Index" class="catalog-page" role="search">
+        <section class="search-panel" aria-labelledby="search-panel-title">
+            <div class="search-panel-head">
+                <span class="search-panel-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3Z" />
+                    </svg>
+                </span>
 
-            <form method="get" role="search" asp-controller="Books" asp-action="Index">
-                <div class="field">
-                    <label for="q">Search</label>
-                    <input class="input" id="q" name="q" type="search" value="@Model.Filter.Search" placeholder="Title or author" />
+                <div>
+                    <h1 id="search-panel-title">Find your next book</h1>
+                    <p>Search the shelf by title or author, then narrow by category and availability.</p>
+                </div>
+            </div>
+
+            <div class="search-panel-body">
+                <div class="search-field">
+                    <label for="q">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m20 20-4-4" />
+                        </svg>
+                        Keywords
+                    </label>
+                    <div class="search-control">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m20 20-4-4" />
+                        </svg>
+                        <input id="q" name="q" type="search" value="@Model.Filter.Search" placeholder="Title or author" autocomplete="off" />
+                    </div>
                 </div>
 
-                <div class="field">
-                    <label for="categoryId">Category</label>
-                    <select class="input" id="categoryId" name="categoryId">
-                        <option value="">All categories</option>
-                        @foreach (var category in Model.Categories)
-                        {
-                            <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@category.DisplayName(false)</option>
-                        }
-                    </select>
+                <div class="search-field">
+                    <label for="categoryId">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                            <path d="M3 7h18M3 12h18M3 17h11" />
+                        </svg>
+                        Category
+                    </label>
+                    <div class="search-control">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                            <path d="M4 5h16M4 12h16M4 19h9" />
+                        </svg>
+                        <select id="categoryId" name="categoryId">
+                            <option value="">All categories</option>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@category.DisplayName(false)</option>
+                            }
+                        </select>
+                    </div>
                 </div>
 
-                <div class="field">
-                    <label for="authorId">Author</label>
-                    <select class="input" id="authorId" name="authorId">
-                        <option value="">All authors</option>
-                        @foreach (var author in Model.Authors)
-                        {
-                            <option value="@author.Id" selected="@(Model.Filter.AuthorId == author.Id)">@author.Name</option>
-                        }
-                    </select>
+                <div class="search-field">
+                    <label for="authorId">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                            <circle cx="12" cy="8" r="3.5" />
+                            <path d="M5 20c.7-4 3.2-6 7-6s6.3 2 7 6" />
+                        </svg>
+                        Author
+                    </label>
+                    <div class="search-control">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                            <circle cx="12" cy="8" r="3.5" />
+                            <path d="M5 20c.7-4 3.2-6 7-6s6.3 2 7 6" />
+                        </svg>
+                        <select id="authorId" name="authorId">
+                            <option value="">All authors</option>
+                            @foreach (var author in Model.Authors)
+                            {
+                                <option value="@author.Id" selected="@(Model.Filter.AuthorId == author.Id)">@author.Name</option>
+                            }
+                        </select>
+                    </div>
                 </div>
 
+                <button class="search-submit" type="submit">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="m20 20-4-4" />
+                    </svg>
+                    Search
+                </button>
+            </div>
+        </section>
+
+        <div class="catalog-layout">
+            <aside class="filters" aria-label="Price and availability filters">
+                <h2>Refine</h2>
+
                 <div class="field">
-                    <label>Price range</label>
+                    <label>Price range (EGP)</label>
                     <div class="filter-row">
                         <input class="input" name="minPrice" type="number" min="0" step="10" placeholder="Min" value="@Model.Filter.MinPrice" />
                         <input class="input" name="maxPrice" type="number" min="0" step="10" placeholder="Max" value="@Model.Filter.MaxPrice" />
@@ -63,57 +123,52 @@
 
                 <input type="hidden" name="sort" value="@Model.Filter.Sort" />
 
-                <button class="btn btn-primary" type="submit" style="inline-size:100%">Apply</button>
+                <button class="btn btn-primary" type="submit" style="inline-size:100%">Apply filters</button>
                 <a class="btn btn-ghost" asp-controller="Books" asp-action="Index" style="inline-size:100%; margin-block-start: var(--space-2)">Clear filters</a>
-            </form>
-        </aside>
+            </aside>
 
-        <div>
-            <div class="catalog-toolbar">
-                <span>@Model.Books.TotalCount @(Model.Books.TotalCount == 1 ? "book" : "books")</span>
+            <div>
+                <div class="catalog-toolbar">
+                    <span>@Model.Books.TotalCount @(Model.Books.TotalCount == 1 ? "book" : "books")</span>
 
-                <form method="get" asp-controller="Books" asp-action="Index" class="inline-form">
-                    @foreach (var pair in routeValues.Where(p => p.Key is not "sort" and not "page"))
-                    {
-                        <input type="hidden" name="@pair.Key" value="@pair.Value" />
-                    }
+                    <label class="catalog-sort">
+                        <span>Sort</span>
+                        <select class="input" id="sort" name="sort" onchange="this.form.submit()">
+                            <option value="Newest" selected="@(Model.Filter.Sort == CatalogSort.Newest)">Newest</option>
+                            <option value="BestSelling" selected="@(Model.Filter.Sort == CatalogSort.BestSelling)">Best selling</option>
+                            <option value="PriceAsc" selected="@(Model.Filter.Sort == CatalogSort.PriceAsc)">Price: low to high</option>
+                            <option value="PriceDesc" selected="@(Model.Filter.Sort == CatalogSort.PriceDesc)">Price: high to low</option>
+                        </select>
+                    </label>
+                </div>
 
-                    <label for="sort" class="visually-hidden">Sort</label>
-                    <select class="input" id="sort" name="sort" onchange="this.form.submit()" style="min-block-size: 40px">
-                        <option value="Newest" selected="@(Model.Filter.Sort == CatalogSort.Newest)">Newest</option>
-                        <option value="BestSelling" selected="@(Model.Filter.Sort == CatalogSort.BestSelling)">Best selling</option>
-                        <option value="PriceAsc" selected="@(Model.Filter.Sort == CatalogSort.PriceAsc)">Price: low to high</option>
-                        <option value="PriceDesc" selected="@(Model.Filter.Sort == CatalogSort.PriceDesc)">Price: high to low</option>
-                    </select>
-                </form>
+                @if (Model.Books.Items.Count == 0)
+                {
+                    <div class="empty-state">
+                        <h2>No results</h2>
+                        <p>Try a different word, or clear the filters.</p>
+                        <a class="btn btn-primary" asp-controller="Books" asp-action="Index">Clear filters</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="book-grid">
+                        @foreach (var book in Model.Books.Items)
+                        {
+                            <partial name="_BookCard" model="book" />
+                        }
+                    </div>
+
+                    <partial name="_Pagination" model="@(new PaginationInfo
+                             {
+                                 Page = Model.Books.Page,
+                                 TotalPages = Model.Books.TotalPages,
+                                 Action = "Index",
+                                 Controller = "Books",
+                                 RouteValues = routeValues
+                             })" />
+                }
             </div>
-
-            @if (Model.Books.Items.Count == 0)
-            {
-                <div class="empty-state">
-                    <h2>No results</h2>
-                    <p>Try a different word, or clear the filters.</p>
-                    <a class="btn btn-primary" asp-controller="Books" asp-action="Index">Clear filters</a>
-                </div>
-            }
-            else
-            {
-                <div class="book-grid">
-                    @foreach (var book in Model.Books.Items)
-                    {
-                        <partial name="_BookCard" model="book" />
-                    }
-                </div>
-
-                <partial name="_Pagination" model="@(new PaginationInfo
-                         {
-                             Page = Model.Books.Page,
-                             TotalPages = Model.Books.TotalPages,
-                             Action = "Index",
-                             Controller = "Books",
-                             RouteValues = routeValues
-                         })" />
-            }
         </div>
-    </div>
+    </form>
 </div>

@@ -35,7 +35,8 @@ public sealed record BookCardDto(
     string? CoverImageUrl,
     bool IsDiscounted,
     double AverageRating,
-    int ReviewCount)
+    int ReviewCount,
+    bool IsDeleted = false)
 {
     public bool HasReviews => ReviewCount > 0;
 }

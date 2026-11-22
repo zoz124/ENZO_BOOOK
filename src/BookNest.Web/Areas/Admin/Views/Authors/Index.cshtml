@@ -1,4 +1,4 @@
-@model IReadOnlyList<BookNest.Core.Entities.Author>
+@model IReadOnlyList<AdminAuthorRow>
 
 @{
     ViewData["Title"] = "Authors";
@@ -7,7 +7,7 @@
 <div class="admin-page-head">
     <div>
         <p class="admin-eyebrow">Catalogue</p>
-        <h2>Authors</h2>
+        <h1>Authors</h1>
         <p>@Model.Count writers represented in the catalogue.</p>
     </div>
 </div>
@@ -25,13 +25,20 @@
                         <tr>
                             <td>@author.Name</td>
                             <td class="cart-line-meta">@(author.Biography is null ? "—" : author.Biography.Length > 60 ? author.Biography[..60] + "…" : author.Biography)</td>
-                            <td class="num">@author.Books.Count</td>
+                            <td class="num">@author.BookCount</td>
                             <td>
-                                <form method="post" asp-area="Admin" asp-controller="Authors" asp-action="Delete" class="inline-form"
-                                      onsubmit="return confirm('Delete this author?');">
-                                    <input type="hidden" name="id" value="@author.Id" />
-                                    <button class="link-button" type="submit">Delete</button>
-                                </form>
+                                @if (author.BookCount == 0)
+                                {
+                                    <form method="post" asp-area="Admin" asp-controller="Authors" asp-action="Delete" class="inline-form"
+                                          onsubmit="return confirm('Delete this author?');">
+                                        <input type="hidden" name="id" value="@author.Id" />
+                                        <button class="link-button" type="submit">Delete</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="cart-line-meta" title="Archive their books first (BR-03)">Has books</span>
+                                }
                             </td>
                         </tr>
                     }

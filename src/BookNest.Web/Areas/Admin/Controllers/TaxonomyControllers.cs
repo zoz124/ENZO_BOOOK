@@ -113,7 +113,14 @@ public class AuthorsController : Controller
     }
 
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
-        => View(await _context.Authors.AsNoTracking().OrderBy(a => a.Name).ToListAsync(cancellationToken));
+        => View(await _context.Authors.AsNoTracking()
+            .OrderBy(a => a.Name)
+            .Select(a => new AdminAuthorRow(
+                a.Id,
+                a.Name,
+                a.Biography,
+                _context.Books.IgnoreQueryFilters().Count(b => b.AuthorId == a.Id)))
+            .ToListAsync(cancellationToken));
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -157,7 +164,7 @@ public class AuthorsController : Controller
 
         await _context.SaveChangesAsync(cancellationToken);
         _catalog.InvalidateHomeCache();
-        TempData["Success"] = "Category saved.";
+        TempData["Success"] = "Author saved.";
         return RedirectToAction(nameof(Index));
     }
 

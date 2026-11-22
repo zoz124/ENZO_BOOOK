@@ -103,10 +103,10 @@ public class AdminBookFormViewModel
     [DataType(DataType.Date)]
     public DateTime? PublishedDate { get; set; }
 
-    [Required(ErrorMessage = "Choose an author."), Display(Name = "Author")]
+    [Range(1, int.MaxValue, ErrorMessage = "Choose an author."), Display(Name = "Author")]
     public int AuthorId { get; set; }
 
-    [Required(ErrorMessage = "Choose a category."), Display(Name = "Category")]
+    [Range(1, int.MaxValue, ErrorMessage = "Choose a category."), Display(Name = "Category")]
     public int CategoryId { get; set; }
 
     public string? CoverImageUrl { get; set; }
@@ -124,6 +124,8 @@ public class AdminOrdersViewModel
     public Core.Enums.OrderStatus? Status { get; set; }
     public string? Search { get; set; }
 }
+
+public sealed record AdminAuthorRow(int Id, string Name, string? Biography, int BookCount);
 
 public class SimpleNameFormViewModel
 {

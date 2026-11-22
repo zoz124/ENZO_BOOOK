@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Enzo Book — dashboard before/after</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 32px; background: #F7F5EF; color: #17231F; font-family: "DM Sans", Arial, sans-serif; }
+  h1 { margin: 0 0 8px; font-size: 28px; }
+  .lead { margin: 0 0 32px; color: #6B7A73; font-size: 14px; }
+  h2 { margin: 40px 0 16px; font-size: 18px; letter-spacing: .04em; text-transform: uppercase; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  figure { margin: 0; background: #fff; border: 1px solid #E0E3DE; border-radius: 12px; overflow: hidden; }
+  figcaption { padding: 10px 14px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #6B7A73; border-bottom: 1px solid #ECEEE9; }
+  figure img { display: block; width: 100%; height: auto; }
+  .states { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { body { padding: 16px; } .pair, .states { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+  <h1>Dashboard redesign — before / after</h1>
+  <p class="lead">Same data (1 order, no reviews) at 1440, 1024, 768 and 390 CSS px. Screenshots captured in headless Chrome.</p>
+
+  <h2>1440 px</h2>
+  <div class="pair">
+    <figure><figcaption>Before</figcaption><img src="before/dashboard-1440.png" alt="Dashboard before at 1440" /></figure>
+    <figure><figcaption>After</figcaption><img src="after/dashboard-1440.png" alt="Dashboard after at 1440" /></figure>
+  </div>
+
+  <h2>1024 px</h2>
+  <div class="pair">
+    <figure><figcaption>Before</figcaption><img src="before/dashboard-1024.png" alt="Dashboard before at 1024" /></figure>
+    <figure><figcaption>After</figcaption><img src="after/dashboard-1024.png" alt="Dashboard after at 1024" /></figure>
+  </div>
+
+  <h2>768 px</h2>
+  <div class="pair">
+    <figure><figcaption>Before</figcaption><img src="before/dashboard-768.png" alt="Dashboard before at 768" /></figure>
+    <figure><figcaption>After</figcaption><img src="after/dashboard-768.png" alt="Dashboard after at 768" /></figure>
+  </div>
+
+  <h2>390 px</h2>
+  <div class="pair">
+    <figure><figcaption>Before</figcaption><img src="before/dashboard-390.png" alt="Dashboard before at 390" /></figure>
+    <figure><figcaption>After</figcaption><img src="after/dashboard-390.png" alt="Dashboard after at 390" /></figure>
+  </div>
+
+  <h2>Data stress states</h2>
+  <div class="states">
+    <figure><figcaption>Empty database</figcaption><img src="empty/dashboard-1440.png" alt="Dashboard with no orders or reviews" /></figure>
+    <figure><figcaption>50 orders + very long titles</figcaption><img src="heavy/dashboard-1440.png" alt="Dashboard with 50 orders and long titles" /></figure>
+  </div>
+</body>
+</html>

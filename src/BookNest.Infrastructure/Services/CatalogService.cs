@@ -26,7 +26,8 @@ public class CatalogService : ICatalogService
         b.CoverImageUrl,
         b.DiscountPrice != null,
         b.Reviews.Select(r => (double?)r.Rating).Average() ?? 0,
-        b.Reviews.Count);
+        b.Reviews.Count,
+        b.IsDeleted);
 
     private readonly ApplicationDbContext _context;
     private readonly IMemoryCache _cache;

@@ -3,6 +3,7 @@
     var displayName = User.Identity?.Name ?? "Admin";
     var initial = displayName.Length > 0 ? displayName[..1].ToUpperInvariant() : "A";
 }
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -14,37 +15,103 @@
 <body class="admin-body">
     <div class="admin-shell">
         <aside class="admin-sidebar">
-            <a class="admin-sidebar-brand" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Enzo Book</a>
+            <a class="admin-sidebar-brand" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">ENZO BOOK</a>
             <p class="admin-sidebar-tagline">Bookseller console</p>
 
             <nav aria-label="Admin sections">
                 <p class="admin-nav-label">Overview</p>
                 <ul class="admin-nav">
-                    <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
-                           aria-current="@(currentController == "Dashboard" ? "page" : null)">Dashboard</a></li>
+                    <li>
+                        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
+                           aria-current="@(currentController == "Dashboard" ? "page" : null)">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                                <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                                <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                                <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                            </svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
                 </ul>
 
                 <p class="admin-nav-label">Catalogue</p>
                 <ul class="admin-nav">
-                    <li><a asp-area="Admin" asp-controller="Books" asp-action="Index"
-                           aria-current="@(currentController == "Books" ? "page" : null)">Books</a></li>
-                    <li><a asp-area="Admin" asp-controller="Categories" asp-action="Index"
-                           aria-current="@(currentController == "Categories" ? "page" : null)">Categories</a></li>
-                    <li><a asp-area="Admin" asp-controller="Authors" asp-action="Index"
-                           aria-current="@(currentController == "Authors" ? "page" : null)">Authors</a></li>
+                    <li>
+                        <a asp-area="Admin" asp-controller="Books" asp-action="Index"
+                           aria-current="@(currentController == "Books" ? "page" : null)">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M4 4h6a2 2 0 0 1 2 2v14a1.6 1.6 0 0 0-1.6-1.6H4Z" />
+                                <path d="M20 4h-6a2 2 0 0 0-2 2v14a1.6 1.6 0 0 1 1.6-1.6H20Z" />
+                            </svg>
+                            <span>Books</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="Admin" asp-controller="Categories" asp-action="Index"
+                           aria-current="@(currentController == "Categories" ? "page" : null)">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M4 5h9l7 7-9 9-7-7V5Z" />
+                                <circle cx="8.5" cy="9.5" r="1.2" />
+                            </svg>
+                            <span>Categories</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="Admin" asp-controller="Authors" asp-action="Index"
+                           aria-current="@(currentController == "Authors" ? "page" : null)">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M4 20c0-3.5 3.6-5.5 8-5.5s8 2 8 5.5" />
+                                <circle cx="12" cy="7.5" r="3.5" />
+                            </svg>
+                            <span>Authors</span>
+                        </a>
+                    </li>
                 </ul>
 
                 <p class="admin-nav-label">Operations</p>
                 <ul class="admin-nav">
-                    <li><a asp-area="Admin" asp-controller="Orders" asp-action="Index"
-                           aria-current="@(currentController == "Orders" ? "page" : null)">Orders</a></li>
-                    <li><a asp-area="Admin" asp-controller="Users" asp-action="Index"
-                           aria-current="@(currentController == "Users" ? "page" : null)">Customers</a></li>
+                    <li>
+                        <a asp-area="Admin" asp-controller="Orders" asp-action="Index"
+                           aria-current="@(currentController == "Orders" ? "page" : null)">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" />
+                                <path d="M9 8h6M9 12h6" />
+                            </svg>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="Admin" asp-controller="Users" asp-action="Index"
+                           aria-current="@(currentController == "Users" ? "page" : null)">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="9" cy="8" r="3.2" />
+                                <path d="M3 20c.6-4 3-6 6-6s5.4 2 6 6" />
+                                <path d="M16 5.2a3 3 0 0 1 0 5.6M18 14c2 .6 3.2 2.4 3.6 5" />
+                            </svg>
+                            <span>Customers</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
 
             <div class="admin-sidebar-foot">
-                <a asp-area="" asp-controller="Home" asp-action="Index">View storefront ↗</a>
+                <a class="admin-storefront" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span>View storefront</span>
+                    <span aria-hidden="true">↗</span>
+                </a>
+
+                <div class="admin-account">
+                    <span class="admin-user-avatar" aria-hidden="true">@initial</span>
+                    <span class="admin-account-copy">
+                        <strong>@displayName</strong>
+                        <small>Store administrator</small>
+                    </span>
+                </div>
+
+                <form method="post" asp-area="" asp-controller="Account" asp-action="Logout">
+                    <button class="admin-signout" type="submit">Sign out</button>
+                </form>
             </div>
         </aside>
 
@@ -52,17 +119,9 @@
             <header class="admin-topbar">
                 <div class="admin-topbar-inner">
                     <span class="admin-eyebrow">Enzo Book — administration</span>
-                    <h1 class="admin-topbar-title">@ViewData["Title"]</h1>
+                    <span class="admin-topbar-sep" aria-hidden="true">/</span>
+                    <p class="admin-topbar-title">@ViewData["Title"]</p>
                 </div>
-
-                <div class="admin-user spacer">
-                    <span class="admin-user-avatar" aria-hidden="true">@initial</span>
-                    <span class="cart-line-meta">@displayName</span>
-                </div>
-
-                <form method="post" asp-area="" asp-controller="Account" asp-action="Logout" class="inline-form">
-                    <button class="btn btn-secondary btn-sm" type="submit">Sign out</button>
-                </form>
             </header>
 
             <div class="admin-content">

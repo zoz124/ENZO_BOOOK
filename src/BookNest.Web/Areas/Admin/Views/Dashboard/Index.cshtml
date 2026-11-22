@@ -4,50 +4,77 @@
     ViewData["Title"] = "Dashboard";
     var max = Model.SalesLast30Days.Count > 0 ? Model.SalesLast30Days.Max(d => d.Total) : 1m;
     if (max <= 0) { max = 1m; }
+    var hasTrend = Model.SalesLast30Days.Count > 1;
+    var singleDay = Model.SalesLast30Days.Count == 1 ? Model.SalesLast30Days[0] : null;
     var firstDay = Model.SalesLast30Days.FirstOrDefault();
     var lastDay = Model.SalesLast30Days.LastOrDefault();
     var topRevenue = Model.TopBooks.Count > 0 ? Model.TopBooks.Max(b => b.Revenue) : 1m;
     if (topRevenue <= 0) { topRevenue = 1m; }
+    var pending = Model.NewOrders;
+    var lowStock = Model.LowStockBooks.Count;
+    var outOfStock = Model.OutOfStockCount;
+    var noReviews = Model.ReviewsCount == 0;
 }
 
-<div class="admin-page-head">
+<div class="admin-page-head admin-page-head--dashboard">
     <div>
         <p class="admin-eyebrow">Store performance</p>
-        <h2>The month at a glance</h2>
-        <p>Sales, orders, stock health and reader feedback for the last 30 days.</p>
+        <h1>The month at a glance</h1>
+        <p class="admin-page-sub">Sales, orders, stock health and reader feedback for the last 30 days.</p>
     </div>
 
-    <div class="inline-form">
-        <span class="admin-chip">@DateTime.Now.ToString("ddd, dd MMM yyyy")</span>
-        <a class="btn btn-secondary btn-sm" asp-area="" asp-controller="Home" asp-action="Index">View storefront ↗</a>
+    <div class="admin-head-meta">
+        <span class="admin-date">@DateTime.Now.ToString("ddd, dd MMM yyyy")</span>
+        <a class="btn btn-primary btn-sm" asp-area="" asp-controller="Home" asp-action="Index">
+            View storefront
+            <span aria-hidden="true">↗</span>
+        </a>
     </div>
 </div>
 
-<div class="stat-grid stat-grid--five">
+<div class="stat-grid">
     <div class="stat-card stat-card--primary">
         <p class="stat-label">Total sales</p>
         <p class="stat-value">EGP @Model.TotalSales.ToString("N0")</p>
-        <p class="stat-label stat-foot">Excluding cancelled orders</p>
+        <p class="stat-foot">Excluding cancelled orders</p>
     </div>
-    <div class="stat-card">
+
+    <a class="stat-card @(pending > 0 ? "stat-card--alert" : null)"
+       asp-area="Admin" asp-controller="Orders" asp-action="Index" asp-route-status="Pending"
+       aria-label="Review @pending pending orders">
         <p class="stat-label">Orders</p>
         <p class="stat-value">@Model.OrdersCount</p>
-        <p class="stat-label stat-foot">@Model.NewOrders pending review</p>
-    </div>
-    <div class="stat-card">
+        <p class="stat-foot">@pending pending review</p>
+    </a>
+
+    <a class="stat-card @(lowStock > 0 ? "stat-card--alert" : null)"
+       asp-area="Admin" asp-controller="Books" asp-action="Index" asp-route-lowStock="true"
+       aria-label="Open the low stock shelf">
         <p class="stat-label">Low stock titles</p>
-        <p class="stat-value">@Model.LowStockBooks.Count</p>
-        <p class="stat-label stat-foot">10 copies or fewer</p>
-    </div>
-    <div class="stat-card">
+        <p class="stat-value">@lowStock</p>
+        <p class="stat-foot">10 copies or fewer</p>
+    </a>
+
+    <a class="stat-card @(outOfStock > 0 ? "stat-card--alert stat-card--danger" : null)"
+       asp-area="Admin" asp-controller="Books" asp-action="Index" asp-route-lowStock="true"
+       aria-label="Open titles that need a restock">
         <p class="stat-label">Out of stock</p>
-        <p class="stat-value">@Model.OutOfStockCount</p>
-        <p class="stat-label stat-foot">Titles unavailable now</p>
-    </div>
+        <p class="stat-value">@outOfStock</p>
+        <p class="stat-foot">Titles unavailable now</p>
+    </a>
+
     <div class="stat-card">
         <p class="stat-label">Reader ratings</p>
-        <p class="stat-value">@Model.ReviewsCount</p>
-        <p class="stat-label stat-foot">Average @Model.AverageRating.ToString("0.0") / 5</p>
+        @if (noReviews)
+        {
+            <p class="stat-value stat-value--text">No reviews yet</p>
+            <p class="stat-foot">Awaiting reader notes</p>
+        }
+        else
+        {
+            <p class="stat-value">@Model.ReviewsCount</p>
+            <p class="stat-foot">Average @Model.AverageRating.ToString("0.0") / 5</p>
+        }
     </div>
 </div>
 
@@ -55,14 +82,47 @@
     <div class="section-head">
         <div>
             <p class="eyebrow">Revenue</p>
-            <h2>Sales, last 30 days</h2>
+            <div class="section-title-row">
+                <h2>Sales, last 30 days</h2>
+                @if (Model.SalesLast30Days.Count > 0)
+                {
+                    <span class="admin-peak">Peak day EGP @max.ToString("N0")</span>
+                }
+            </div>
         </div>
-        <span class="cart-line-meta">Peak day: EGP @max.ToString("N0")</span>
     </div>
 
     @if (Model.SalesLast30Days.Count == 0)
     {
-        <div class="empty-state"><p>No sales recorded in this period.</p></div>
+        <div class="empty-state empty-state--admin">
+            <span class="empty-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+                    <path d="M4 19V5M4 19h16" />
+                    <path d="m7 15 4-5 3 3 4-6" />
+                </svg>
+            </span>
+            <p>No sales recorded in this period. The first order will start the chart.</p>
+        </div>
+    }
+    else if (!hasTrend)
+    {
+        <div class="chart-empty">
+            <span class="empty-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+                    <path d="M4 19V5M4 19h16" />
+                    <path d="m7 15 4-5 3 3 4-6" />
+                </svg>
+            </span>
+            <div class="chart-empty-copy">
+                <strong>A trend needs more than a day</strong>
+                <p>There is a single day of sales in this window, so there is no line to compare yet.</p>
+            </div>
+            <div class="chart-single">
+                <span class="chart-single-value">EGP @(singleDay?.Total.ToString("N0") ?? "0")</span>
+                <span class="chart-single-bar" aria-hidden="true"></span>
+                <span class="chart-single-day">@singleDay?.Day.ToString("dd MMM")</span>
+            </div>
+        </div>
     }
     else
     {
@@ -91,12 +151,20 @@
 
         @if (Model.TopBooks.Count == 0)
         {
-            <div class="empty-state"><p>No sales yet.</p></div>
+            <div class="empty-state empty-state--admin">
+                <span class="empty-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 5h6a2 2 0 0 1 2 2v13a1.6 1.6 0 0 0-1.6-1.6H4Z" />
+                        <path d="M20 5h-6a2 2 0 0 0-2 2v13a1.6 1.6 0 0 1 1.6-1.6H20Z" />
+                    </svg>
+                </span>
+                <p>No sales yet — top sellers appear after the first order.</p>
+            </div>
         }
         else
         {
             <div class="table-wrapper">
-                <table class="table">
+                <table class="table top-books-table">
                     <thead>
                         <tr><th>#</th><th>Book</th><th class="num">Copies</th><th class="num">Revenue</th></tr>
                     </thead>
@@ -107,7 +175,7 @@
                             rank++;
                             <tr>
                                 <td><span class="rank">@rank.ToString("00")</span></td>
-                                <td>
+                                <td class="top-book-title">
                                     @book.Title
                                     <span class="admin-bar" style="inline-size:@(Math.Round(book.Revenue / topRevenue * 100))%"></span>
                                 </td>
@@ -129,7 +197,14 @@
 
         @if (Model.CategorySales.Count == 0)
         {
-            <div class="empty-state"><p>No sales yet.</p></div>
+            <div class="empty-state empty-state--admin">
+                <span class="empty-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19V9M10 19V5M16 19v-7M22 19H2" />
+                    </svg>
+                </span>
+                <p>No category demand yet. Sales will show which shelves move.</p>
+            </div>
         }
         else
         {
@@ -147,17 +222,17 @@
 
     <aside>
         <section>
-            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Quick actions</h2></div>
+            <div class="section-head"><h2 class="section-title-sm">Quick actions</h2></div>
 
             <div class="admin-actions">
                 <a asp-area="Admin" asp-controller="Books" asp-action="Create">
                     <span>Add a new book</span><span aria-hidden="true">→</span>
                 </a>
                 <a asp-area="Admin" asp-controller="Orders" asp-action="Index" asp-route-status="Pending">
-                    <span>Orders to review (@Model.NewOrders)</span><span aria-hidden="true">→</span>
+                    <span>Orders to review (@pending)</span><span aria-hidden="true">→</span>
                 </a>
                 <a asp-area="Admin" asp-controller="Books" asp-action="Index" asp-route-lowStock="true">
-                    <span>Low stock shelf (@Model.LowStockBooks.Count)</span><span aria-hidden="true">→</span>
+                    <span>Low stock shelf (@lowStock)</span><span aria-hidden="true">→</span>
                 </a>
                 <a asp-area="Admin" asp-controller="Users" asp-action="Index">
                     <span>Customers</span><span aria-hidden="true">→</span>
@@ -166,11 +241,18 @@
         </section>
 
         <section>
-            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Latest reviews</h2></div>
+            <div class="section-head"><h2 class="section-title-sm">Latest reviews</h2></div>
 
             @if (Model.RecentReviews.Count == 0)
             {
-                <div class="empty-state"><p>No reviews yet.</p></div>
+                <div class="empty-state empty-state--admin">
+                    <span class="empty-icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.6 8.6 0 0 1-3.9-.9L3 21l1.9-5.6a8.6 8.6 0 0 1-.9-3.9A8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5Z" />
+                        </svg>
+                    </span>
+                    <p>No reviews yet. Reader notes will land here.</p>
+                </div>
             }
             else
             {
@@ -195,11 +277,18 @@
         </section>
 
         <section>
-            <div class="section-head"><h2 style="font-size: var(--font-size-h3)">Low stock</h2></div>
+            <div class="section-head"><h2 class="section-title-sm">Low stock</h2></div>
 
-            @if (Model.LowStockBooks.Count == 0)
+            @if (lowStock == 0)
             {
-                <div class="empty-state"><p>Every title is well stocked.</p></div>
+                <div class="empty-state empty-state--admin">
+                    <span class="empty-icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m5 13 4 4L19 7" />
+                        </svg>
+                    </span>
+                    <p>Every title is well stocked.</p>
+                </div>
             }
             else
             {
