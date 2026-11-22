@@ -22,7 +22,7 @@
 
 <div class="toolbar">
     <form method="get" asp-area="Admin" asp-controller="Books" asp-action="Index" class="inline-form">
-        <input class="input" name="q" type="search" value="@search" placeholder="Search by title or ISBN" style="min-block-size: 42px; min-inline-size: 280px" />
+        <input class="input toolbar-search" name="q" type="search" value="@search" placeholder="Search by title or ISBN" style="min-block-size: 42px" />
         <label class="check-row">
             <input type="checkbox" name="lowStock" value="true" checked="@lowStock" /> Low stock only
         </label>

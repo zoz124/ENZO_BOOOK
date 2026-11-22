@@ -380,6 +380,10 @@
 }
 
 /* ---------- Catalog layout ---------- */
+.cart-layout > * {
+  min-inline-size: 0;
+}
+
 .catalog-layout {
   display: grid;
   grid-template-columns: 288px 1fr;
@@ -829,7 +833,7 @@
   .filters { position: static; }
   .book-detail { grid-template-columns: 1fr; gap: var(--space-8); }
   .book-detail-cover { position: static; max-inline-size: 360px; }
-  .cart-layout { grid-template-columns: 1fr; }
+  .cart-layout { grid-template-columns: minmax(0, 1fr); }
   .summary-card { position: static; }
   .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .band-grid { grid-template-columns: 1fr; gap: var(--space-8); }

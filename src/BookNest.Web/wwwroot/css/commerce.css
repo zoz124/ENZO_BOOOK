@@ -929,3 +929,35 @@
   .pay-options--inline { grid-template-columns: 1fr; }
   .stat-grid--five { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ---------- Small-screen header fit ---------- */
+@media (max-width: 520px) {
+  .site-nav {
+    gap: 8px;
+    padding-inline: 16px;
+  }
+
+  .site-actions {
+    gap: 0;
+  }
+
+  .site-actions .icon-btn {
+    min-inline-size: 34px;
+    min-block-size: 34px;
+    padding: 4px;
+  }
+
+  .site-actions a[aria-label="Search books"] {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .site-actions a[aria-label="Admin"] {
+    display: none;
+  }
+
+  .site-logo span {
+    font-size: 24px;
+  }
+}

@@ -19,9 +19,9 @@
 
 <div class="toolbar">
     <form method="get" asp-area="Admin" asp-controller="Orders" asp-action="Index" class="inline-form">
-        <input class="input" name="q" type="search" value="@search" placeholder="Order number or customer email" style="min-block-size: 42px; min-inline-size: 300px" />
+        <input class="input toolbar-search" name="q" type="search" value="@search" placeholder="Order number or customer email" style="min-block-size: 42px" />
 
-        <select class="input" name="status" style="min-block-size: 42px; min-inline-size: 170px">
+        <select class="input toolbar-select" name="status" style="min-block-size: 42px">
             <option value="">All statuses</option>
             @foreach (var status in Enum.GetValues<OrderStatus>())
             {

@@ -892,10 +892,6 @@ a.stat-card:focus-visible,
     padding: 12px 16px;
   }
 
-  .admin-topbar-title {
-    font-size: 18px;
-  }
-
   .admin-content {
     padding: 16px;
     padding-block-end: 48px;
@@ -947,5 +943,39 @@ a.stat-card:focus-visible,
 
   .admin-split {
     gap: 24px;
+  }
+}
+
+/* ---------- Admin filter toolbars ---------- */
+.toolbar .inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  inline-size: 100%;
+  max-inline-size: 100%;
+}
+
+.toolbar .toolbar-search {
+  flex: 1 1 200px;
+  inline-size: min(320px, 100%);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.toolbar .toolbar-select {
+  flex: 0 1 190px;
+  inline-size: min(190px, 100%);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.toolbar .check-row {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+  .toolbar .inline-form > .btn {
+    flex: 1 1 100%;
   }
 }
